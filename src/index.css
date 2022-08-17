@@ -1,0 +1,38 @@
+*{
+    margin:0;
+    padding:0;
+}
+body{
+    background: #13191c;
+    height:100vh;
+    width:100vw;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+#board{
+    width:100vw;
+    display:grid;
+    grid:auto-flow/repeat(2,1fr);
+}
+.colourCont > div{
+    height:3rem;
+    width:40%;
+    min-width:10rem;
+    border: .5px solid #fff;
+    margin:.5rem auto;
+    transition: .5s;
+}
+.correct{
+    cursor: auto !important; 
+    width: 35% !important;
+    min-width:5rem;
+}
+#selected{
+    width:50%;
+    min-width: 15rem;
+    height:3.5rem;
+}
+#userG > div{
+    cursor: pointer;
+}
