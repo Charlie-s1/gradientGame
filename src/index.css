@@ -21,6 +21,8 @@ body{
     min-width:10rem;
     border-radius: 10px;
     margin:.5rem auto;
+    left:0;
+    transition: left .5s ease-in-out;
     transition: .5s;
 }
 .correct{
@@ -32,11 +34,43 @@ body{
     position: relative;
     z-index: 1000;
     width:50%;
-    min-width: 15rem;
-    height:3.5rem;
+    /* height:3.5rem; */
+    left:0;
     box-shadow: 0rem 0rem 2rem #101010;
 }
 #userG > div{
     cursor: pointer;
-    
+}
+@media screen and (max-width:1000px) {
+    #board{
+        display:flex;
+        justify-content: center;
+    }
+    #toDo{
+        display:flex;
+        flex-direction: column;
+    }
+    #toDo > div{
+        border-radius: 10px 0 0 10px;
+        border-right:1px white solid !important;
+        box-sizing: border-box;
+    }
+    #userG{
+        display: flex;
+        flex-direction: column;
+    }
+    #userG > div{
+        width:80%;
+        border-radius: 0 10px 10px 0;
+        box-sizing: border-box;
+    }
+    #selected{
+        width:40%;
+        left:-1rem;
+    }
+    .correct{
+        width:10px !important;
+        box-shadow: inset 0rem 0rem 1rem -2px black;
+        border: black solid 1px;
+    }
 }
