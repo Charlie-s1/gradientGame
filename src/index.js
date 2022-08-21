@@ -1,14 +1,16 @@
 import React from "react";
 import {createRoot} from "react-dom/client";
+import Gradient from "javascript-color-gradient";
 import "./index.css"
 
 function RenderBox(props){
+    const border = props.col!=null ? "none": "solid 1px #fff";
     return(
         <div 
             onClick={(e)=>props.onClick(e,props.id)} 
             id={props.selected?"selected":null} 
             className={props.correct?"correct":null}
-            style={{background:props.col}}
+            style={{background:props.col,border:border}}
         ></div>
     )
 }
@@ -32,15 +34,13 @@ class Board extends React.Component{
             turn:0,
             gradient:[],
             randomGradient:[],
-            userGradient:Array(8).fill([null,null,null]),
+            userGradient:[],
         }
     }
     newTurn(e,id){
         let newUGrad = this.state.userGradient;
         newUGrad[id] = this.state.randomGradient[this.state.turn];
         
-        // console.log(this.state.gradient==this.state.randomGradient);
-        // console.log(this.state.gradient,this.state.usergradient);
         this.setState({
             turn:this.state.randomGradient.length-1<=this.state.turn? 0:this.state.turn+=1,
             userGradient:newUGrad,
@@ -51,26 +51,21 @@ class Board extends React.Component{
             })            
         }
     }
-    getColours(){
-        let colour1 = Math.floor(Math.random() *256);
-        let colour2 = Math.floor(Math.random() *256);
-        let colour3 = Math.floor(Math.random() *256);
 
-        let colours = [colour1,colour2,colour3];
-
-        return colours;
+    randomColour(){
+        const hexVal = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
+        let num = "";
+        for(let i=0;i<6;i++){
+            num += hexVal[Math.floor(Math.random()*hexVal.length)];
+        }
+        return num;
     }
     createGradient(){
-        let col = this.getColours();
-        let newGradient = [];
-        for(let i=0;i<8;i++){
-            newGradient.push(col.concat());
-            col[0]-20>0 ? col[0]-=20 : col[0]=0;
-            col[1]-20>0 ? col[1]-=20 : col[1]=0;
-            col[2]-20>0 ? col[2]-=20 : col[2]=0;
-
-        }
+        const newGradient = new Gradient()
+            .setColorGradient(`#${this.randomColour()}`,`#${this.randomColour()}`)
+            .getColors();
         this.state.gradient=newGradient;
+        this.state.userGradient=Array(newGradient.length).fill(null)
     }
     createGBoxes(){
         let toReturn = [];
@@ -93,7 +88,7 @@ class Board extends React.Component{
             toReturn.push(
                 <RenderBox
                     selected={count==this.state.turn?true:false}
-                    col={`rgb(${g[0]},${g[1]},${g[2]})`}
+                    col={g}
                     key={"0"+this.state.gradient.indexOf(g)}
                 />
             )
@@ -107,7 +102,7 @@ class Board extends React.Component{
         for(const box of this.state.userGradient){
             newBoxes.push(
                 <RenderBox
-                    col={`rgb(${box[0]},${box[1]},${box[2]})`}
+                    col={box}
                     key={"1"+count}
                     id={count}
                     correct={this.state.gradient[count]==this.state.userGradient[count]}

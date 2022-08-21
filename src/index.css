@@ -19,7 +19,7 @@ body{
     height:3rem;
     width:40%;
     min-width:10rem;
-    border: .5px solid #fff;
+    border-radius: 10px;
     margin:.5rem auto;
     transition: .5s;
 }
@@ -29,10 +29,14 @@ body{
     min-width:5rem;
 }
 #selected{
+    position: relative;
+    z-index: 1000;
     width:50%;
     min-width: 15rem;
     height:3.5rem;
+    box-shadow: 0rem 0rem 2rem #101010;
 }
 #userG > div{
     cursor: pointer;
+    
 }
