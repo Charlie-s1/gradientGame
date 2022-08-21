@@ -2,10 +2,12 @@
     margin:0;
     padding:0;
 }
+html,body{
+    height:100%;
+    width:100%;
+}
 body{
     background: #13191c;
-    height:100vh;
-    width:100vw;
     display:flex;
     justify-content: center;
     align-items: center;
@@ -14,6 +16,17 @@ body{
     width:100vw;
     display:grid;
     grid:auto-flow/repeat(2,1fr);
+}
+#turnCount{
+    color:white;
+    position: absolute;
+    font-size: 2rem;
+    font-family: sans-serif;
+    top:0;
+    left:50%;
+    user-select: none;
+    transform: translate(-50%);
+    z-index: 1000;
 }
 .colourCont > div{
     height:3rem;
@@ -71,6 +84,5 @@ body{
     .correct{
         width:10px !important;
         box-shadow: inset 0rem 0rem 1rem -2px black;
-        border: black solid 1px;
     }
 }
