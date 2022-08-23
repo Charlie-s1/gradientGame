@@ -23,18 +23,30 @@ function RenderDoneScreen(props){
             <div id="doneText">
                 <h1>{date.toDateString()} Puzzle</h1>
                 <p>Completed in {props.turns} turns</p>
-                <button id="share" onClick={(e)=>copyToClipboard(e,date.toDateString(),props.turns)}>Share</button>
+                <button id="share" onClick={(e)=>share(e,date.toDateString(),props.turns)}>Share</button>
                 <p id="copyMsg">Copied to Clipboard</p>
             </div>
         </div>
     )
 }
-function copyToClipboard(e,date,turns){
-    navigator.clipboard.writeText(`I completed the puzzle on ${date} in ${turns} turns \nTry at charlie-s.com/gradientGame`).then(()=> {
+async function share(e,date,turns){
+    const shareData = {
+        title:"Gradient Game",
+        text:`I completed the puzzle on ${date} in ${turns} turns \nTry at charlie-s.com/gradientGame`,
+        url:"https://charlie-s.com/gradientGame"
+    }
+    try{
+        await navigator.share(shareData)
         document.querySelector("#copyMsg").style.visibility = "visible";
-    },() => {
-        alert("Error copying score")
-    })
+    }catch(err){
+        try{
+            await navigator.clipboard.writeText(`I completed the puzzle on ${date} in ${turns} turns \nTry at charlie-s.com/gradientGame`);
+            document.querySelector("#copyMsg").style.visibility = "visible";    
+        }
+        catch(err){
+            alert("Error sharing")
+        }
+    }
 }
 function arrayEqual(a,b){
     if(a.length != b.length){
