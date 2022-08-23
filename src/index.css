@@ -17,6 +17,38 @@ body{
     display:grid;
     grid:auto-flow/repeat(2,1fr);
 }
+#doneScreenCont{
+    top:0;
+    position: absolute;
+    z-index: 100000;
+    color:white;
+    font-family: sans-serif;
+    width:100%;
+    height:100%;
+    background: #13191c8e;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    justify-content: center;
+    align-items: center;
+}
+#doneText{
+    text-align: center;
+}
+
+#doneText >p{
+    font-size: 1.5rem;
+}
+#doneText>button{
+    background:white;
+    border-radius: .5rem;
+    border:none;
+    margin-top:2rem;
+    color:#101018;
+    height: 2.5rem;
+    width:5rem;
+    font-size:1.5rem;
+    cursor: pointer;
+}
 #turnCount{
     color:white;
     position: absolute;
@@ -33,9 +65,8 @@ body{
     width:40%;
     min-width:10rem;
     border-radius: 10px;
-    margin:.5rem auto;
+    margin:1% auto;
     left:0;
-    transition: left .5s ease-in-out;
     transition: .5s;
 }
 .correct{
@@ -67,6 +98,9 @@ body{
         border-radius: 10px 0 0 10px;
         border-right:1px white solid !important;
         box-sizing: border-box;
+    }
+    #toDo .correct{
+        visibility: hidden;
     }
     #userG{
         display: flex;
