@@ -24,15 +24,16 @@ function RenderDoneScreen(props){
                 <h1>{date.toDateString()} Puzzle</h1>
                 <p>Completed in {props.turns} turns</p>
                 <button id="share" onClick={(e)=>copyToClipboard(e,date.toDateString(),props.turns)}>Share</button>
+                <p id="copyMsg">Copied to Clipboard</p>
             </div>
         </div>
     )
 }
 function copyToClipboard(e,date,turns){
     navigator.clipboard.writeText(`I completed the puzzle on ${date} in ${turns} turns \nTry at charlie-s.com/gradientGame`).then(()=> {
-
+        document.querySelector("#copyMsg").style.visibility = "visible";
     },() => {
-        alert("ERROR")
+        alert("Error copying score")
     })
 }
 function arrayEqual(a,b){
@@ -181,7 +182,7 @@ class Board extends React.Component{
                 </aside>
                 <RenderDoneScreen
                     show={this.state.done}
-                    turns={this.state.turn}
+                    turns={this.state.turnsTaken} 
                 />
                 <p id="turnCount">{this.state.turnsTaken}</p>
             </div>

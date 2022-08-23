@@ -34,9 +34,13 @@ body{
 #doneText{
     text-align: center;
 }
-
 #doneText >p{
     font-size: 1.5rem;
+}
+#copyMsg{
+    visibility: hidden;
+    margin-top:1.5rem;
+    font-size: 1rem !important;
 }
 #doneText>button{
     background:white;
