@@ -20,6 +20,24 @@ function RenderBox(props){
     )
 }
 /**
+ * create help screen
+ */
+function RenderHelpScreen(props){
+    return(
+        <div id="helpScreenCont">
+            <div id="helpText">
+                <p id="closeHelp" onClick={()=>document.querySelector("#helpScreenCont").style.display = "none"}>X</p>
+                <h1>How To Play</h1>
+                <br></br>
+                <p>Complete the gradient is as little clicks as possible</p>
+                <p>Click/Tap on boxes on the right of screen to fill the selected colour on the left into it</p>
+                <p>The box on the right will change appearance when it is correct</p>
+                <p>Keep going until all of the boxes are correct</p>
+            </div>
+        </div>
+    )
+}
+/**
  * Create finish screen and allow user to share
  */
 function RenderDoneScreen(props){
@@ -108,6 +126,7 @@ class Board extends React.Component{
         newUGrad[id] = this.state.randomGradient[this.state.turn];
         let newTurn = this.state.turnsTaken+1;
         let newRandomG = this.state.randomGradient.slice();
+        const rGradient = this.state.gradient.slice().reverse();
         newRandomG.map((g)=>{
             newUGrad.map((n)=>{
                 if(g.col==n.col && n.correct){
@@ -117,6 +136,7 @@ class Board extends React.Component{
         });
 
         if(!this.state.done){
+            
             if(this.state.turn==newRandomG.length-1 && newRandomG[0].correct){
                 this.state.turn=0;
             }
@@ -128,11 +148,7 @@ class Board extends React.Component{
                 }
             }
         }
-        if(arrayEqual(this.state.gradient,this.state.userGradient)){
-            this.setState({
-                done:true,
-            })            
-        }
+        
         this.setState({
             randomGradient:newRandomG,
             turn:this.state.randomGradient.length-1<=this.state.turn? 0:this.state.turn+=1,
@@ -187,7 +203,10 @@ class Board extends React.Component{
             }
             this.state.randomGradient = randomG;
         }
-        this.state.done = arrayEqual(this.state.userGradient,this.state.gradient)
+        this.state.done = this.state.reverse ? 
+            arrayEqual(this.state.userGradient,this.state.gradient.slice().reverse()) : 
+            arrayEqual(this.state.userGradient,this.state.gradient);
+        
         const rGradient = this.state.randomGradient.slice();
         rGradient.map((n,index)=>{
             toReturn.push(
@@ -224,7 +243,8 @@ class Board extends React.Component{
                 if(rGradient[count]==uGradient[count]){
                     this.state.userGradient[count].correct = true;
                 }
-            }else if(!this.state.reverse){
+            }
+            if(!this.state.reverse){
                 if(gradient[count]==uGradient[count]){
                     this.state.userGradient[count].correct = true;
                 }
@@ -259,7 +279,12 @@ class Board extends React.Component{
                     show={this.state.done}
                     turns={this.state.turnsTaken} 
                 />
+                <RenderHelpScreen
+                />
                 <p id="turnCount">{this.state.turnsTaken}</p>
+                <p id="helpToggle" onClick={(e)=>{
+                    document.querySelector("#helpScreenCont").style.display = "flex"
+                }}>?</p>
             </div>
         )
     }
