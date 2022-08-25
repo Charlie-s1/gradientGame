@@ -4,6 +4,7 @@ import Gradient from "javascript-color-gradient";
 import seedrandom from "seedrandom";
 import "./index.css"
 
+const firstPuzzle = new Date("2022/08/17");
 /**
  * create gradient container
  */
@@ -24,12 +25,15 @@ function RenderBox(props){
 function RenderDoneScreen(props){
     
     const date=new Date();
+    const tDiff = date.getTime()-firstPuzzle.getTime();
+    const puzzleNum = Math.floor(tDiff/(1000*3600*24));
+
     return(
         <div id="doneScreenCont" style={{display:props.show ? "flex" : "none"}}>
             <div id="doneText">
-                <h1>{date.toDateString()} Puzzle</h1>
+                <h1>Puzzle {puzzleNum}</h1>
                 <p>Completed in {props.turns} turns</p>
-                <button id="share" onClick={(e)=>share(e,date.toDateString(),props.turns)}>Share</button>
+                <button id="share" onClick={(e)=>share(e,puzzleNum,props.turns)}>Share</button>
                 <p id="copyMsg">Copied to Clipboard</p>
             </div>
         </div>
@@ -38,10 +42,12 @@ function RenderDoneScreen(props){
 /**
  * Share score or copy to clipboard if cannot share
  */
-async function share(e,date,turns){
+async function share(e,puzzleNum,turns){
+    
+    
     const shareData = {
         title:"Gradient Game",
-        text:`Puzzle: ${date}\nTurns:  ${turns}\n`,
+        text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}\n`,
         url:"https://charlie-s.com/gradientGame"
     }
     const shareMsg = document.querySelector("#copyMsg")
@@ -54,13 +60,14 @@ async function share(e,date,turns){
         shareMsg.style.visibility = "visible";   
     }catch(err){
         try{
-            await navigator.clipboard.writeText(`Puzzle: ${date}\nTurns: ${turns}\n\nhttps://charlie-s.com/gradientGame`);
+            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns: ${turns}\n\nhttps://charlie-s.com/gradientGame`);
+            shareMsg.textContent = "Copied to Clipboard"
+            document.querySelector("#copyMsg").style.visibility = "visible";    
         }
         catch(err){
             alert("Error sharing");
         }
-        shareMsg.textContent = "Copied to Clipboard"
-        document.querySelector("#copyMsg").style.visibility = "visible"; 
+        
     }
 }
 /**

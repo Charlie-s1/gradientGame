@@ -72,7 +72,9 @@ body{
     margin:1% auto;
     left:0;
     transition: .5s;
+    -webkit-tap-highlight-color: transparent;
 }
+
 .correct{
     cursor: auto !important; 
     width: 35% !important;
