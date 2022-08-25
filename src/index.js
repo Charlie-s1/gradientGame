@@ -95,6 +95,7 @@ class Board extends React.Component{
             gradient:[],
             randomGradient:[],
             userGradient:[],
+            reverse:null,
         }
     }
 /**
@@ -128,7 +129,6 @@ class Board extends React.Component{
             }
         }
         if(arrayEqual(this.state.gradient,this.state.userGradient)){
-            console.log("done");
             this.setState({
                 done:true,
             })            
@@ -203,20 +203,39 @@ class Board extends React.Component{
     }
 /**
  * create a box for each of user input using RenderBox
+ * check order of gradient in user box
  */
     createUBoxes(){
         let newBoxes = [];
         let count=0;
+        const gradient = this.state.gradient.slice();
+        const rGradient = gradient.slice().reverse();
+        const uGradient = this.state.userGradient.slice();
+        const reverse = this.state.reverse;
+
         for(const box of this.state.userGradient){
-            if(this.state.gradient[count]==this.state.userGradient[count]){
-                this.state.userGradient[count].correct = true;
+            if(gradient[count]==uGradient[count] && reverse==null){
+                this.state.reverse = false;
+            }else if(rGradient[count]==uGradient[count] && reverse==null){
+                this.state.reverse = true;
             }
+
+            if (this.state.reverse){
+                if(rGradient[count]==uGradient[count]){
+                    this.state.userGradient[count].correct = true;
+                }
+            }else if(!this.state.reverse){
+                if(gradient[count]==uGradient[count]){
+                    this.state.userGradient[count].correct = true;
+                }
+            }
+
             newBoxes.push(
                 <RenderBox
                     key={"1"+count}
                     col={box?box.col:null}
                     id={count}
-                    correct={this.state.gradient[count]==this.state.userGradient[count]}
+                    correct={this.state.reverse ? rGradient[count]==uGradient[count] : gradient[count]==uGradient[count]}
                     onClick={(e,id)=>this.newTurn(e,id)}
                 />
             )
