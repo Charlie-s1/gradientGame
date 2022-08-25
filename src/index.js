@@ -4,6 +4,9 @@ import Gradient from "javascript-color-gradient";
 import seedrandom from "seedrandom";
 import "./index.css"
 
+/**
+ * create gradient container
+ */
 function RenderBox(props){
     const border = props.col!=null ? "none": "solid 1px #fff";
     return(
@@ -15,6 +18,9 @@ function RenderBox(props){
         ></div>
     )
 }
+/**
+ * Create finish screen and allow user to share
+ */
 function RenderDoneScreen(props){
     
     const date=new Date();
@@ -29,25 +35,37 @@ function RenderDoneScreen(props){
         </div>
     )
 }
+/**
+ * Share score or copy to clipboard if cannot share
+ */
 async function share(e,date,turns){
     const shareData = {
         title:"Gradient Game",
-        text:`I completed the puzzle on ${date} in ${turns} turns \nTry at charlie-s.com/gradientGame`,
+        text:`Puzzle: ${date}\nTurns:  ${turns}\n`,
         url:"https://charlie-s.com/gradientGame"
     }
+    const shareMsg = document.querySelector("#copyMsg")
     try{
+        if(navigator.userAgent.toLowerCase().indexOf('firefox')>-1){
+            throw "cannot share";
+        }
         await navigator.share(shareData)
-        document.querySelector("#copyMsg").style.visibility = "visible";
+        shareMsg.textContent = "Share Successful"
+        shareMsg.style.visibility = "visible";   
     }catch(err){
         try{
-            await navigator.clipboard.writeText(`I completed the puzzle on ${date} in ${turns} turns \nTry at charlie-s.com/gradientGame`);
-            document.querySelector("#copyMsg").style.visibility = "visible";    
+            await navigator.clipboard.writeText(`Puzzle: ${date}\nTurns: ${turns}\n\nhttps://charlie-s.com/gradientGame`);
         }
         catch(err){
-            alert("Error sharing")
+            alert("Error sharing");
         }
+        shareMsg.textContent = "Copied to Clipboard"
+        document.querySelector("#copyMsg").style.visibility = "visible"; 
     }
 }
+/**
+ * Compare two arrays and return true if equal
+ */
 function arrayEqual(a,b){
     if(a.length != b.length){
         return false;
@@ -72,6 +90,11 @@ class Board extends React.Component{
             userGradient:[],
         }
     }
+/**
+ * go to next on random gradient list
+ * check if any on list are correct
+ * check if game has finished
+ */
     newTurn(e,id){
         let newUGrad = this.state.userGradient.slice();
         newUGrad[id] = this.state.randomGradient[this.state.turn];
@@ -109,9 +132,10 @@ class Board extends React.Component{
             userGradient:newUGrad,
             turnsTaken:newTurn,
         });
-        
     }
-
+/**
+ * create colours dependin on date and addition
+ */
     randomColour(addition){
         const d = new Date();
         let dString = `${d.getYear()}${d.getMonth()}${d.getDate()}${addition}`
@@ -126,6 +150,10 @@ class Board extends React.Component{
         }
         return num;
     }
+/**
+ * create two colours using randomColour()
+ * create gradient with 10 steps between the two colours
+ */
     createGradient(){
         const newGradient = new Gradient()
             .setColorGradient(`#${this.randomColour(0)}`,`#${this.randomColour(1)}`)
@@ -133,6 +161,9 @@ class Board extends React.Component{
         this.state.gradient=newGradient.map(i=>{return {col:i,correct:false}});
         this.state.userGradient=Array(newGradient.length).fill({});
     }
+/**
+ * randomise gradient and return a box for each colour using RenderBox
+ */
     createGBoxes(){
         let toReturn = [];
         if(this.state.done){
@@ -163,6 +194,9 @@ class Board extends React.Component{
         })
         return toReturn;
     }
+/**
+ * create a box for each of user input using RenderBox
+ */
     createUBoxes(){
         let newBoxes = [];
         let count=0;
@@ -182,7 +216,10 @@ class Board extends React.Component{
             count++;
         }
         return newBoxes;
-    }   
+    }
+/**
+ * Create UI using createGBoxes(), createUBoxes() and show current score
+ */   
     render(){
         return(
             <div id="board">

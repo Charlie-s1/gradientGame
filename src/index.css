@@ -104,7 +104,7 @@ body{
         box-sizing: border-box;
     }
     #toDo .correct{
-        visibility: hidden;
+        opacity: 0;
     }
     #userG{
         display: flex;
@@ -121,6 +121,6 @@ body{
     }
     .correct{
         width:10px !important;
-        box-shadow: inset 0rem 0rem 1rem -2px black;
+        box-shadow: inset 0rem 0rem 1rem black;
     }
 }
