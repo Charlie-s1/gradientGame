@@ -29,8 +29,8 @@ function RenderHelpScreen(props){
                 <p id="closeHelp" onClick={()=>document.querySelector("#helpScreenCont").style.display = "none"}>X</p>
                 <h1>How To Play</h1>
                 <br></br>
-                <p>Complete the gradient is as little clicks as possible</p>
-                <p>Click/Tap on boxes on the right of screen to fill the selected colour on the left into it</p>
+                <p>Complete the gradient in as little turns as possible</p>
+                <p>Click/Tap on the boxes on the right of the screen to fill the selected colour from the left into it</p>
                 <p>The box on the right will change appearance when it is correct</p>
                 <p>Keep going until all of the boxes are correct</p>
             </div>
@@ -61,8 +61,6 @@ function RenderDoneScreen(props){
  * Share score or copy to clipboard if cannot share
  */
 async function share(e,puzzleNum,turns){
-    
-    
     const shareData = {
         title:"Gradient Game",
         text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}\n`,
@@ -78,7 +76,7 @@ async function share(e,puzzleNum,turns){
         shareMsg.style.visibility = "visible";   
     }catch(err){
         try{
-            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns: ${turns}\n\nhttps://charlie-s.com/gradientGame`);
+            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns: ${turns}\nhttps://charlie-s.com/gradientGame`);
             shareMsg.textContent = "Copied to Clipboard"
             document.querySelector("#copyMsg").style.visibility = "visible";    
         }
@@ -127,6 +125,8 @@ class Board extends React.Component{
         let newTurn = this.state.turnsTaken+1;
         let newRandomG = this.state.randomGradient.slice();
         const rGradient = this.state.gradient.slice().reverse();
+        let turnNum = this.state.turn;
+
         newRandomG.map((g)=>{
             newUGrad.map((n)=>{
                 if(g.col==n.col && n.correct){
@@ -136,22 +136,42 @@ class Board extends React.Component{
         });
 
         if(!this.state.done){
-            
-            if(this.state.turn==newRandomG.length-1 && newRandomG[0].correct){
-                this.state.turn=0;
-            }
-            if(newRandomG[this.state.turn+1] && newRandomG[this.state.turn+1].correct){
-                for (let i=this.state.turn;i<newRandomG.length;i++){
-                    if(newRandomG[this.state.turn+1] && newRandomG[this.state.turn+1].correct){
-                        this.state.turn++;
+            //skip complete boxes
+            if(newRandomG[turnNum+1] && newRandomG[turnNum+1].correct){
+                for (let i=turnNum;i<newRandomG.length;i++){
+                    if(newRandomG[turnNum+1] && newRandomG[turnNum+1].correct){
+                        ++turnNum;
                     }
+                }
+            }
+            //go to start if complete
+            if (newRandomG.length-1<=turnNum){
+                turnNum=0;
+            }else{
+                ++turnNum;
+            }
+            //if 0 is complete loop again
+            if(turnNum==0 && newRandomG[0].correct){
+                turnNum=-1;
+                console.log(turnNum);
+
+                if(newRandomG[turnNum+1] && newRandomG[turnNum+1].correct){
+                    console.log("correct");
+                    for (let i=turnNum;i<newRandomG.length;i++){
+                        console.log(i);
+                        if(newRandomG[turnNum+1] && newRandomG[turnNum+1].correct){
+                            console.log("add");
+                            ++turnNum;
+                        }
+                    }
+                    ++turnNum;
                 }
             }
         }
         
         this.setState({
             randomGradient:newRandomG,
-            turn:this.state.randomGradient.length-1<=this.state.turn? 0:this.state.turn+=1,
+            turn:turnNum,
             userGradient:newUGrad,
             turnsTaken:newTurn,
         });
