@@ -53,6 +53,9 @@ body{
     font-size:1.5rem;
     cursor: pointer;
 }
+#doneText h1{
+    margin-bottom:1rem;
+}
 #turnCount{
     color:white;
     position: absolute;

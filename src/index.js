@@ -5,6 +5,7 @@ import seedrandom from "seedrandom";
 import "./index.css"
 
 const firstPuzzle = new Date("2022/08/17");
+const startPuzzle = new Date();
 /**
  * create gradient container
  */
@@ -45,13 +46,16 @@ function RenderDoneScreen(props){
     const date=new Date();
     const tDiff = date.getTime()-firstPuzzle.getTime();
     const puzzleNum = Math.floor(tDiff/(1000*3600*24));
+    const timeTaken = Math.abs((props.start.getTime() - date.getTime())/1000); 
+    
 
     return(
         <div id="doneScreenCont" style={{display:props.show ? "flex" : "none"}}>
             <div id="doneText">
                 <h1>Puzzle {puzzleNum}</h1>
                 <p>Completed in {props.turns} turns</p>
-                <button id="share" onClick={(e)=>share(e,puzzleNum,props.turns)}>Share</button>
+                <p>and took {timeTaken} seconds</p>
+                <button id="share" onClick={(e)=>share(e,puzzleNum,props.turns,timeTaken)}>Share</button>
                 <p id="copyMsg">Copied to Clipboard</p>
             </div>
         </div>
@@ -60,10 +64,10 @@ function RenderDoneScreen(props){
 /**
  * Share score or copy to clipboard if cannot share
  */
-async function share(e,puzzleNum,turns){
+async function share(e,puzzleNum,turns,time){
     const shareData = {
         title:"Gradient Game",
-        text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}\n`,
+        text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}\nTime:   ${time}sec\n`,
         url:"https://charlie-s.com/gradientGame"
     }
     const shareMsg = document.querySelector("#copyMsg")
@@ -76,7 +80,7 @@ async function share(e,puzzleNum,turns){
         shareMsg.style.visibility = "visible";   
     }catch(err){
         try{
-            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns: ${turns}\nhttps://charlie-s.com/gradientGame`);
+            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns:  ${turns}\nTime:   ${time}sec\nhttps://charlie-s.com/gradientGame`);
             shareMsg.textContent = "Copied to Clipboard"
             document.querySelector("#copyMsg").style.visibility = "visible";    
         }
@@ -153,14 +157,10 @@ class Board extends React.Component{
             //if 0 is complete loop again
             if(turnNum==0 && newRandomG[0].correct){
                 turnNum=-1;
-                console.log(turnNum);
 
                 if(newRandomG[turnNum+1] && newRandomG[turnNum+1].correct){
-                    console.log("correct");
                     for (let i=turnNum;i<newRandomG.length;i++){
-                        console.log(i);
                         if(newRandomG[turnNum+1] && newRandomG[turnNum+1].correct){
-                            console.log("add");
                             ++turnNum;
                         }
                     }
@@ -297,7 +297,8 @@ class Board extends React.Component{
                 </aside>
                 <RenderDoneScreen
                     show={this.state.done}
-                    turns={this.state.turnsTaken} 
+                    turns={this.state.turnsTaken}
+                    start={startPuzzle}
                 />
                 <RenderHelpScreen
                 />
