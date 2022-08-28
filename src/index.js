@@ -128,16 +128,7 @@ class Board extends React.Component{
         newUGrad[id] = this.state.randomGradient[this.state.turn];
         let newTurn = this.state.turnsTaken+1;
         let newRandomG = this.state.randomGradient.slice();
-        const rGradient = this.state.gradient.slice().reverse();
         let turnNum = this.state.turn;
-
-        newRandomG.map((g)=>{
-            newUGrad.map((n)=>{
-                if(g.col==n.col && n.correct){
-                    g.correct = true;
-                }
-            });
-        });
 
         if(!this.state.done){
             //skip complete boxes
@@ -214,6 +205,7 @@ class Board extends React.Component{
 
             let randomG = this.state.gradient.slice();
             let currentIndex = randomG.length,  randomIndex;
+
             while (currentIndex != 0) {
                 randomIndex = Math.floor(Math.random() * currentIndex);
                 currentIndex--;
@@ -250,26 +242,10 @@ class Board extends React.Component{
         const gradient = this.state.gradient.slice();
         const rGradient = gradient.slice().reverse();
         const uGradient = this.state.userGradient.slice();
-        const reverse = this.state.reverse;
+        const randomGradient = this.state.randomGradient.slice();
 
         for(const box of this.state.userGradient){
-            if(gradient[count]==uGradient[count] && reverse==null){
-                this.state.reverse = false;
-            }else if(rGradient[count]==uGradient[count] && reverse==null){
-                this.state.reverse = true;
-            }
-
-            if (this.state.reverse){
-                if(rGradient[count]==uGradient[count]){
-                    this.state.userGradient[count].correct = true;
-                }
-            }
-            if(!this.state.reverse){
-                if(gradient[count]==uGradient[count]){
-                    this.state.userGradient[count].correct = true;
-                }
-            }
-
+            
             newBoxes.push(
                 <RenderBox
                     key={"1"+count}
@@ -281,7 +257,58 @@ class Board extends React.Component{
             )
             count++;
         }
+        
+        this.state.randomGradient = randomGradient;
         return newBoxes;
+    }
+    createUI(){
+        const gradient = this.state.gradient.slice();
+        const rGradient = gradient.slice().reverse();
+        const uGradient = this.state.userGradient.slice();
+        let newRandomG = this.state.randomGradient.slice();
+        const reverse = this.state.reverse;
+
+
+        uGradient.map((n,i)=>{
+            //check if user is going in reverse order
+            if(gradient[i]==n && reverse==null){
+                this.state.reverse = false;
+            }else if(rGradient[i]==n && reverse==null){
+                this.state.reverse = true;
+            }
+            //check if correct placement depending on the order
+            if (this.state.reverse){
+                if(rGradient[i]==n){
+                    n.correct = true;
+                }
+            }
+            if(!this.state.reverse){
+                if(gradient[i]==n){
+                    n.correct = true;
+                }
+            }
+        });
+        newRandomG.map((g)=>{
+            //make random gradient item correct if placed correctly
+            uGradient.map((n)=>{
+                if(g.col==n.col && n.correct){
+                    g.correct = true;
+                }
+            });
+        });
+
+        this.state.randomGradient = newRandomG;
+        this.state.userGradient = uGradient;
+        return(
+            <div id="gameArea">
+                <aside className="colourCont" id="toDo">
+                    {this.createGBoxes()}
+                </aside>
+                <aside className="colourCont" id="userG">
+                    {this.createUBoxes()}
+                </aside>
+            </div>
+        )
     }
 /**
  * Create UI using createGBoxes(), createUBoxes() and show current score
@@ -289,12 +316,7 @@ class Board extends React.Component{
     render(){
         return(
             <div id="board">
-                <aside className="colourCont" id="toDo">
-                    {this.createGBoxes()}
-                </aside>
-                <aside className="colourCont" id="userG">
-                    {this.createUBoxes()}
-                </aside>
+                {this.createUI()}
                 <RenderDoneScreen
                     show={this.state.done}
                     turns={this.state.turnsTaken}

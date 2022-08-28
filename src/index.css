@@ -12,10 +12,12 @@ body{
     justify-content: center;
     align-items: center;
 }
-#board{
-    width:100vw;
+#gameArea{
     display:grid;
     grid:auto-flow/repeat(2,1fr);
+}
+#board{
+    width:100vw;
 }
 #doneScreenCont{
     top:0;
