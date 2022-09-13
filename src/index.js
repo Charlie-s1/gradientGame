@@ -2,10 +2,11 @@ import React from "react";
 import {createRoot} from "react-dom/client";
 import Gradient from "javascript-color-gradient";
 import seedrandom from "seedrandom";
+import CookieConsent, {Cookies, getCookieConsentValue} from "react-cookie-consent";
 import "./index.css"
 
 const firstPuzzle = new Date("2022/08/17");
-const startPuzzle = new Date();
+const startPuzzle = Cookies.get("startTime") ? new Date(Cookies.get("startTime")) : new Date();
 /**
  * create gradient container
  */
@@ -116,6 +117,9 @@ class Board extends React.Component{
             randomGradient:[],
             userGradient:[],
             reverse:null,
+        }
+        if (getCookieConsentValue) {
+            props.setCookies();
         }
     }
 /**
@@ -334,9 +338,37 @@ class Board extends React.Component{
 }
 
 class Game extends React.Component{
+    cookiesAccepted(e){
+        const expireDate = new Date();
+        expireDate.getFullYear(startPuzzle.getFullYear());
+        expireDate.setMonth(startPuzzle.getMonth());
+        expireDate.setDate(startPuzzle.getDate()+1);
+        expireDate.setHours(0);
+        expireDate.setMinutes(0);
+        expireDate.setSeconds(0);
+
+        Cookies.set("startTime",startPuzzle,{sameSite:"Lax", expires:expireDate})
+    }
     render(){
         return(
-            <Board/>
+            <div>
+                <Board
+                    setCookies = {(e)=>this.cookiesAccepted(e)}
+                />
+                <CookieConsent
+                    style={{fontFamily:"sans-serif", background:"#1e282c"}}
+                    buttonStyle={{
+                        background:"#1e282c",
+                        height:"2rem", 
+                        boxShadow: "5px 5px 10px #13191c,-5px -5px 10px #29373c", 
+                        borderRadius:"10px", 
+                        color:"white",
+                    }}
+                    onAccept={(e)=>this.cookiesAccepted(e)}
+                >
+                    This website uses cookies to enhance the user experience.
+                </CookieConsent>
+            </div>
         )
     }
 }
