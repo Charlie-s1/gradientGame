@@ -6,7 +6,8 @@ import CookieConsent, {Cookies, getCookieConsentValue} from "react-cookie-consen
 import "./index.css"
 
 const firstPuzzle = new Date("2022/08/17");
-const startPuzzle = Cookies.get("startTime") ? new Date(Cookies.get("startTime")) : new Date();
+// const startPuzzle = Cookies.get("startTime") ? new Date(Cookies.get("startTime")) : new Date();
+const startPuzzle = new Date();
 const expireDate = new Date();
 expireDate.getFullYear(startPuzzle.getFullYear());
 expireDate.setMonth(startPuzzle.getMonth());
@@ -15,7 +16,7 @@ expireDate.setHours(0);
 expireDate.setMinutes(0);
 expireDate.setSeconds(0);
 
-let refresh = Cookies.get("refreshCount") ? +Cookies.get("refreshCount") + 1 : 0;;
+let refresh = Cookies.get("refreshCount") ? +Cookies.get("refreshCount") + 1 : 1;;
 
 /**
  * create gradient container
@@ -65,9 +66,14 @@ function RenderDoneScreen(props){
                 <h1>Puzzle {puzzleNum}</h1>
                 <p>Completed in {props.turns} turns</p>
                 <p>and took {timeTaken} seconds</p>
-                <p>with {refresh} refreshes</p>
+                <p>with {refresh} {refresh>1?"tries":"try"}</p>
                 <button id="share" onClick={(e)=>share(e,puzzleNum,props.turns,timeTaken)}>Share</button>
                 <p id="copyMsg">Copied to Clipboard</p>
+            </div>
+            <div id="footer">
+                <div id="emailCont">
+                    <p>Suggestions? Please send them to <u>gradient.game@charlie-s.com</u></p>
+                </div>
             </div>
         </div>
     )
@@ -78,7 +84,7 @@ function RenderDoneScreen(props){
 async function share(e,puzzleNum,turns,time){
     const shareData = {
         title:"Gradient Game",
-        text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}\nTries:  ${refresh}\nTime:   ${time}sec\n`,
+        text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}\nTries:   ${refresh}\nTime:   ${time}sec\n`,
         url:"https://charlie-s.com/gradientGame"
     }
     const shareMsg = document.querySelector("#copyMsg")
@@ -91,7 +97,7 @@ async function share(e,puzzleNum,turns,time){
         shareMsg.style.visibility = "visible";   
     }catch(err){
         try{
-            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns:  ${turns}\nTries:  ${refresh}\nTime:   ${time}sec\nhttps://charlie-s.com/gradientGame`);
+            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns:  ${turns}\nTries:   ${refresh}\nTime:   ${time}sec\nhttps://charlie-s.com/gradientGame`);
             shareMsg.textContent = "Copied to Clipboard"
             document.querySelector("#copyMsg").style.visibility = "visible";    
         }
@@ -350,7 +356,7 @@ class Board extends React.Component{
 class Game extends React.Component{
     cookiesAccepted(e){
         Cookies.set("refreshCount",refresh,{sameSite:"Lax",expires:expireDate});
-        Cookies.set("startTime",startPuzzle,{sameSite:"Lax", expires:expireDate});
+        // Cookies.set("startTime",startPuzzle,{sameSite:"Lax"});
     }
     render(){
         return(
