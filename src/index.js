@@ -75,16 +75,19 @@ class RenderDoneScreen extends React.Component{
         let hours = Math.floor(timeToNewPuzzle%(1000*60*60*24)/(1000*60*60));
         let mins = Math.floor(timeToNewPuzzle%(1000*60*60)/(1000*60));
         let secs = Math.floor(timeToNewPuzzle%(1000*60)/1000);
-        this.interval = setInterval(()=>this.setState({date:Date.now()}),1000)
+        this.interval = setInterval(()=>this.setState({date:Date.now()}),1000);
+        const turns = this.state.stats ? this.state.stats.turnsTaken : this.props.turns;
+        const time = this.state.stats ? this.state.timeTaken : timeTaken;
+        const refreshes = this.state.stats ? this.state.stats.refreshes : refresh;
         return(
             <div id="completeGradient" style={{display:this.props.done ? "flex" : "none", background:`linear-gradient(${this.props.completeG[0]},${this.props.completeG[this.props.completeG.length-1]})`}}>
                 <div id="doneScreenCont">
                     <div id="doneText">
                         <h1>Puzzle {this.state.puzzleNum}</h1>
-                        <p>Completed in {this.state.stats ? this.state.stats.turnsTaken : this.props.turns} turns</p>
-                        <p>and took {this.state.stats ? this.state.timeTaken : timeTaken} seconds</p>
-                        <p>with {this.state.stats ? this.state.stats.refreshes : refresh} {(this.state.stats ? this.state.stats.refreshes : refresh)>1?"tries":"try"}</p>
-                        <button id="share" onClick={(e)=>share(e,puzzleNum,props.turns,timeTaken)}>Share</button>
+                        <p>Completed in {turns} turns</p>
+                        <p>and took {time} seconds</p>
+                        <p>with {refreshes} {(refreshes)>1?"tries":"try"}</p>
+                        <button id="share" onClick={(e)=>share(e,this.state.puzzleNum,turns,time,refreshes)}>Share</button>
                         <p id="copyMsg">Copied to Clipboard</p>
 
                         <p>Next puzzle in {`${hours}h ${mins}m ${secs}s`}</p>
@@ -102,10 +105,10 @@ class RenderDoneScreen extends React.Component{
 /**
  * Share score or copy to clipboard if cannot share
  */
-async function share(e,puzzleNum,turns,time){
+async function share(e,puzzleNum,turns,time,refreshes){
     const shareData = {
         title:"Gradient Game",
-        text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}\nTries:   ${refresh}\nTime:   ${time}sec\n`,
+        text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}\nTries:   ${refreshes}\nTime:   ${time}sec\n`,
         url:"https://charlie-s.com/gradientGame"
     }
     const shareMsg = document.querySelector("#copyMsg")
@@ -118,7 +121,7 @@ async function share(e,puzzleNum,turns,time){
         shareMsg.style.visibility = "visible";   
     }catch(err){
         try{
-            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns:  ${turns}\nTries:   ${refresh}\nTime:   ${time}sec\nhttps://charlie-s.com/gradientGame`);
+            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns:  ${turns}\nTries:   ${refreshes}\nTime:   ${time}sec\nhttps://charlie-s.com/gradientGame`);
             shareMsg.textContent = "Copied to Clipboard"
             document.querySelector("#copyMsg").style.visibility = "visible";    
         }
