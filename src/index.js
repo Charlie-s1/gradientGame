@@ -16,7 +16,8 @@ expireDate.setHours(0);
 expireDate.setMinutes(0);
 expireDate.setSeconds(0);
 
-let refresh = Cookies.get("refreshCount") ? +Cookies.get("refreshCount") + 1 : 1;;
+let refresh = Cookies.get("refreshCount") ? +Cookies.get("refreshCount") + 1 : 1;
+let savedScore = Cookies.get("savedScore") || null;
 
 /**
  * create gradient container
@@ -25,8 +26,8 @@ function RenderBox(props){
     const border = props.col!=null ? "none": "solid 1px #fff";
     return(
         <div 
-            onClick={!props.correct?(e)=>props.onClick(e,props.id):null} 
-            id={props.selected?"selected":null} 
+            onClick={!props.correct?(e)=>props.onClick(e,props.id):null}
+            id={props.selected?"selected":null}
             className={props.correct?"correct":null}
             style={{background:props.col,border:border}}
         ></div>
@@ -53,30 +54,50 @@ function RenderHelpScreen(props){
 /**
  * Create finish screen and allow user to share
  */
-function RenderDoneScreen(props){
+class RenderDoneScreen extends React.Component{
+    constructor(props){
+        const date=new Date();
+        const tDiff = date.getTime()-firstPuzzle.getTime();
+        const statsInfo = JSON.parse(props.info)
+        super(props);
+        this.state = {
+            date:new Date(),
+            newPuzzleDate:expireDate,
+            stats:statsInfo,
+            puzzleNum:Math.floor(tDiff/(1000*3600*24)),
+            timeTaken:statsInfo ? Math.abs((new Date(statsInfo.timeStart).getTime() - new Date(statsInfo.timeFin).getTime())/1000) : null
+        }
+    }
     
-    const date=new Date();
-    const tDiff = date.getTime()-firstPuzzle.getTime();
-    const puzzleNum = Math.floor(tDiff/(1000*3600*24));
-    const timeTaken = Math.abs((props.start.getTime() - date.getTime())/1000); 
-    
-    return(
-        <div id="doneScreenCont" style={{display:props.show ? "flex" : "none"}}>
-            <div id="doneText">
-                <h1>Puzzle {puzzleNum}</h1>
-                <p>Completed in {props.turns} turns</p>
-                <p>and took {timeTaken} seconds</p>
-                <p>with {refresh} {refresh>1?"tries":"try"}</p>
-                <button id="share" onClick={(e)=>share(e,puzzleNum,props.turns,timeTaken)}>Share</button>
-                <p id="copyMsg">Copied to Clipboard</p>
-            </div>
-            <div id="footer">
-                <div id="emailCont">
-                    <p>Suggestions? Please send them to <u>gradient.game@charlie-s.com</u></p>
+    render(){
+        const timeTaken = Math.abs((this.props.start-this.props.finish)/1000);
+        let timeToNewPuzzle = this.state.newPuzzleDate-this.state.date;
+        let hours = Math.floor(timeToNewPuzzle%(1000*60*60*24)/(1000*60*60));
+        let mins = Math.floor(timeToNewPuzzle%(1000*60*60)/(1000*60));
+        let secs = Math.floor(timeToNewPuzzle%(1000*60)/1000);
+        this.interval = setInterval(()=>this.setState({date:Date.now()}),1000)
+        return(
+            <div id="completeGradient" style={{display:this.props.done ? "flex" : "none", background:`linear-gradient(${this.props.completeG[0]},${this.props.completeG[this.props.completeG.length-1]})`}}>
+                <div id="doneScreenCont">
+                    <div id="doneText">
+                        <h1>Puzzle {this.state.puzzleNum}</h1>
+                        <p>Completed in {this.state.stats ? this.state.stats.turnsTaken : this.props.turns} turns</p>
+                        <p>and took {this.state.stats ? this.state.timeTaken : timeTaken} seconds</p>
+                        <p>with {this.state.stats ? this.state.stats.refreshes : refresh} {(this.state.stats ? this.state.stats.refreshes : refresh)>1?"tries":"try"}</p>
+                        <button id="share" onClick={(e)=>share(e,puzzleNum,props.turns,timeTaken)}>Share</button>
+                        <p id="copyMsg">Copied to Clipboard</p>
+
+                        <p>Next puzzle in {`${hours}h ${mins}m ${secs}s`}</p>
+                    </div>
+                    <div id="footer">
+                        <div id="emailCont">
+                            <p>Suggestions? Please send them to <u>gradient.game@charlie-s.com</u></p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    )
+        )
+    }
 }
 /**
  * Share score or copy to clipboard if cannot share
@@ -126,17 +147,21 @@ class Board extends React.Component{
     constructor(props){
         super(props)
         this.state = {
-            done:true,
+            done:savedScore || true,
             turn:0,
             turnsTaken:0,
             gradient:[],
             randomGradient:[],
             userGradient:[],
             reverse:null,
+            date:null
         }
         if (getCookieConsentValue) {
             props.setCookies();
         }
+    }
+    update(e){
+        this.setState({date:new Date(),})
     }
 /**
  * go to next on random gradient list
@@ -215,12 +240,19 @@ class Board extends React.Component{
         this.state.gradient=newGradient.map(i=>{return {col:i,correct:false}});
         this.state.userGradient=Array(newGradient.length).fill({});
     }
+    getGradient(){
+        const newGradient = new Gradient()
+            .setColorGradient(`#${this.randomColour(0)}`,`#${this.randomColour(1)}`)
+            .getColors();
+
+        return newGradient
+    }
 /**
  * randomise gradient and return a box for each colour using RenderBox
  */
     createGBoxes(){
         let toReturn = [];
-        if(this.state.done){
+        if(this.state.done == true){
             this.createGradient();
 
             let randomG = this.state.gradient.slice();
@@ -238,6 +270,20 @@ class Board extends React.Component{
         this.state.done = this.state.reverse ? 
             arrayEqual(this.state.userGradient,this.state.gradient.slice().reverse()) : 
             arrayEqual(this.state.userGradient,this.state.gradient);
+
+        if (this.state.done && this.state.turnsTaken>9 && getCookieConsentValue()){
+            Cookies.set(
+                "savedScore",
+                JSON.stringify({
+                    turnsTaken:this.state.turnsTaken,
+                    timeStart:startPuzzle,
+                    timeFin:new Date(),
+                    refreshes:refresh
+                }),
+                {sameSite:"Lax",expires:expireDate}
+            )
+            Cookies.set("refreshCount",refresh,{sameSite:"Lax",expires:expireDate});
+        }
         
         const rGradient = this.state.randomGradient.slice();
         rGradient.map((n,index)=>{
@@ -263,7 +309,6 @@ class Board extends React.Component{
         const rGradient = gradient.slice().reverse();
         const uGradient = this.state.userGradient.slice();
         const randomGradient = this.state.randomGradient.slice();
-
         for(const box of this.state.userGradient){
             
             newBoxes.push(
@@ -278,6 +323,7 @@ class Board extends React.Component{
             count++;
         }
         
+        
         this.state.randomGradient = randomGradient;
         return newBoxes;
     }
@@ -287,7 +333,7 @@ class Board extends React.Component{
         const uGradient = this.state.userGradient.slice();
         let newRandomG = this.state.randomGradient.slice();
         const reverse = this.state.reverse;
-
+        
 
         uGradient.map((n,i)=>{
             //check if user is going in reverse order
@@ -316,7 +362,7 @@ class Board extends React.Component{
                 }
             });
         });
-
+        
         this.state.randomGradient = newRandomG;
         this.state.userGradient = uGradient;
         return(
@@ -334,13 +380,19 @@ class Board extends React.Component{
  * Create UI using createGBoxes(), createUBoxes() and show current score
  */   
     render(){
+
         return(
             <div id="board">
                 {this.createUI()}
                 <RenderDoneScreen
-                    show={this.state.done}
+                    done={this.state.done}
+                    info={savedScore}
                     turns={this.state.turnsTaken}
                     start={startPuzzle}
+                    finish={new Date()}
+                    update={(e)=>this.update(e)}
+                    reverse={this.state.reverse || false}
+                    completeG={this.getGradient()}
                 />
                 <RenderHelpScreen
                 />
@@ -356,7 +408,6 @@ class Board extends React.Component{
 class Game extends React.Component{
     cookiesAccepted(e){
         Cookies.set("refreshCount",refresh,{sameSite:"Lax",expires:expireDate});
-        // Cookies.set("startTime",startPuzzle,{sameSite:"Lax"});
     }
     render(){
         return(
