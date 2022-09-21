@@ -3,10 +3,10 @@ import {createRoot} from "react-dom/client";
 import Gradient from "javascript-color-gradient";
 import seedrandom from "seedrandom";
 import CookieConsent, {Cookies, getCookieConsentValue} from "react-cookie-consent";
-import "./index.css"
+import "./index.css";
+import ReactGA from 'react-ga4';
 
 const firstPuzzle = new Date("2022/08/17");
-// const startPuzzle = Cookies.get("startTime") ? new Date(Cookies.get("startTime")) : new Date();
 const startPuzzle = new Date();
 const expireDate = new Date();
 expireDate.getFullYear(startPuzzle.getFullYear());
@@ -16,9 +16,22 @@ expireDate.setHours(0);
 expireDate.setMinutes(0);
 expireDate.setSeconds(0);
 
+const streakExpire = new Date(expireDate);
+streakExpire.setDate(expireDate.getDate()+1);
+
 let refresh = Cookies.get("refreshCount") ? +Cookies.get("refreshCount") + 1 : 1;
 let savedScore = Cookies.get("savedScore") || null;
+let streak = Cookies.get("currentStreak") ? JSON.parse(Cookies.get("currentStreak")) : {"score":1,"updated":new Date()};
+if(new Date(streak.updated).toDateString() != new Date().toDateString()){
+    streak.score+=1;
+} 
+let longestStreak = Cookies.get("longestStreak") ? +Cookies.get("longestStreak") : streak.score;
+if (longestStreak < streak.score){
+    longestStreak = streak.score;
+}
 
+ReactGA.initialize("G-FLKH25X653");
+ReactGA.send("pageview");
 /**
  * create gradient container
  */
@@ -87,10 +100,23 @@ class RenderDoneScreen extends React.Component{
                         <p>Completed in {turns} turns</p>
                         <p>and took {time} seconds</p>
                         <p>with {refreshes} {(refreshes)>1?"tries":"try"}</p>
+                        <div id="stats">
+                            <h3>Streak</h3>
+                            <div id="streakData">
+                                <div id="curStreak">
+                                    <p>{streak.score}</p>
+                                    <p id="curStreak">Current</p>
+                                </div>
+                                <div id="maxStreak">
+                                    <p>{longestStreak}</p>
+                                    <p id="longStreak">Longest</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p id="countDown">Next puzzle in {`${hours}h ${mins}m ${secs}s`}</p>
                         <button id="share" onClick={(e)=>share(e,this.state.puzzleNum,turns,time,refreshes)}>Share</button>
                         <p id="copyMsg">Copied to Clipboard</p>
 
-                        <p>Next puzzle in {`${hours}h ${mins}m ${secs}s`}</p>
                     </div>
                     <div id="footer">
                         <div id="emailCont">
@@ -118,12 +144,20 @@ async function share(e,puzzleNum,turns,time,refreshes){
         }
         await navigator.share(shareData)
         shareMsg.textContent = "Share Successful"
-        shareMsg.style.visibility = "visible";   
+        shareMsg.style.visibility = "visible";
+        ReactGA.event({
+            category:"share",
+            action:"share"
+        })   
     }catch(err){
         try{
             await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns:  ${turns}\nTries:   ${refreshes}\nTime:   ${time}sec\nhttps://charlie-s.com/gradientGame`);
             shareMsg.textContent = "Copied to Clipboard"
             document.querySelector("#copyMsg").style.visibility = "visible";    
+            ReactGA.event({
+                category:"copyScore",
+                action:"copyScore"
+            })   
         }
         catch(err){
             alert("Error sharing");
@@ -411,6 +445,8 @@ class Board extends React.Component{
 class Game extends React.Component{
     cookiesAccepted(e){
         Cookies.set("refreshCount",refresh,{sameSite:"Lax",expires:expireDate});
+        Cookies.set("currentStreak",JSON.stringify({score:streak.score,updated:new Date()}),{sameSite:"Lax",expires:streakExpire});
+        Cookies.set("longestStreak",longestStreak,{sameSite:"Lax"});
     }
     render(){
         return(

@@ -52,6 +52,22 @@ body{
     margin-top:1.5rem;
     font-size: 1rem !important;
 }
+#stats{
+    border-top:1px solid white;
+    margin:1rem;
+    padding-top:1rem;
+    font-size: 1.2rem;
+}
+#streakData{
+    margin-top:.5rem;
+    display: flex;
+    justify-content: center;
+    gap:3rem;
+}
+#countDown{
+    margin-top:.5rem;
+    font-size: 1.2rem !important;
+}
 #doneText>button{
     background:white;
     border-radius: .5rem;
