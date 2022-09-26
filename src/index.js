@@ -88,6 +88,7 @@ class RenderDoneScreen extends React.Component{
         let hours = Math.floor(timeToNewPuzzle%(1000*60*60*24)/(1000*60*60));
         let mins = Math.floor(timeToNewPuzzle%(1000*60*60)/(1000*60));
         let secs = Math.floor(timeToNewPuzzle%(1000*60)/1000);
+        let timeText = timeToNewPuzzle>0 ? `${hours}h ${mins}m ${secs}s` : "Refresh for new puzzle"
         this.interval = setInterval(()=>this.setState({date:Date.now()}),1000);
         const turns = this.state.stats ? this.state.stats.turnsTaken : this.props.turns;
         const time = this.state.stats ? this.state.timeTaken : timeTaken;
@@ -113,7 +114,7 @@ class RenderDoneScreen extends React.Component{
                                 </div>
                             </div>
                         </div>
-                        <p id="countDown">Next puzzle in {`${hours}h ${mins}m ${secs}s`}</p>
+                        <p id="countDown">Next puzzle in {timeText}</p>
                         <button id="share" onClick={(e)=>share(e,this.state.puzzleNum,turns,time,refreshes)}>Share</button>
                         <p id="copyMsg">Copied to Clipboard</p>
 
@@ -433,6 +434,16 @@ class Board extends React.Component{
                 />
                 <RenderHelpScreen
                 />
+                <svg id="refresh" onClick={(e)=>window.location.reload(false)} viewBox="0 0 50 50">
+                    <mask id="block">
+                        <rect x="0" y="0" width="40" height="22" fill="white"/>
+                        <rect x="0" y="0" width="15" height="35" fill="white"/>
+                        <rect x="10" y="30" width="40" height="30" fill="white"/>
+                    </mask>
+                    <circle cx="20" cy="20" r="15" stroke="white" strokeWidth="3" fill="none" mask="url(#block)"/>
+                    <line x1="25" y1="15" x2="36" y2="22" stroke="white" strokeWidth="3"/>
+                    <line x1="42" y1="13" x2="34" y2="22" stroke="white" strokeWidth="3"/>
+                </svg>
                 <p id="turnCount">{this.state.turnsTaken}</p>
                 <p id="helpToggle" onClick={(e)=>{
                     document.querySelector("#helpScreenCont").style.display = "flex"
@@ -446,7 +457,7 @@ class Game extends React.Component{
     cookiesAccepted(e){
         Cookies.set("refreshCount",refresh,{sameSite:"Lax",expires:expireDate});
         Cookies.set("currentStreak",JSON.stringify({score:streak.score,updated:new Date()}),{sameSite:"Lax",expires:streakExpire});
-        Cookies.set("longestStreak",longestStreak,{sameSite:"Lax"});
+        Cookies.set("longestStreak",longestStreak,{sameSite:"Lax",expires:365});
     }
     render(){
         return(

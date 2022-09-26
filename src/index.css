@@ -3,6 +3,7 @@
     padding:0;
 }
 html,body{
+    background: #13191c;
     height:100%;
     width:100%;
 }
@@ -103,6 +104,13 @@ body{
 #footer p{
     font-size: 1rem;
     cursor: default;
+}
+#refresh{
+    position: absolute;
+    top:.5rem;
+    left:.5rem;
+    cursor: pointer;
+    width:3rem;
 }
 #turnCount{
     color:white;
