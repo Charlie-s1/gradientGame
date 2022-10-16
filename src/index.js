@@ -133,10 +133,26 @@ class RenderDoneScreen extends React.Component{
  * Share score or copy to clipboard if cannot share
  */
 async function share(e,puzzleNum,turns,time,refreshes){
+    const emojis = {
+        "best":"\u{1f525}",
+        "good":"\u{1f62c}",
+        "bad":"\u{1f922}",
+    }
     const shareData = {
         title:"Gradient Game",
-        text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}\nTries:   ${refreshes}\nTime:   ${time}sec\n`,
+        text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}  ${chooseEmoji(turns,10,15)}\nTries:   ${refreshes} ${chooseEmoji(refreshes,1,3)}\nTime:   ${time}sec  ${chooseEmoji(time,30,60)}\n`,
         url:"https://charlie-s.com/gradientGame"
+    }
+    
+    function chooseEmoji(num,best,good){
+        console.log(num<=good);
+        if(num<=best){
+            return emojis.best;
+        }else if(num<=good){
+            return emojis.good;
+        }else{
+            return emojis.bad;
+        }
     }
     const shareMsg = document.querySelector("#copyMsg")
     try{
@@ -152,7 +168,7 @@ async function share(e,puzzleNum,turns,time,refreshes){
         })   
     }catch(err){
         try{
-            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns:  ${turns}\nTries:   ${refreshes}\nTime:   ${time}sec\nhttps://charlie-s.com/gradientGame`);
+            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns:  ${turns} ${chooseEmoji(turns,10,15,20)}\nTries:   ${refreshes} ${chooseEmoji(refreshes,1,3,5)}\nTime:   ${time}sec ${chooseEmoji(time,30,60,110)}\nhttps://charlie-s.com/gradientGame`);
             shareMsg.textContent = "Copied to Clipboard"
             document.querySelector("#copyMsg").style.visibility = "visible";    
             ReactGA.event({
@@ -321,6 +337,8 @@ class Board extends React.Component{
                 {sameSite:"Lax",expires:expireDate}
             )
             Cookies.set("refreshCount",refresh,{sameSite:"Lax",expires:expireDate});
+            Cookies.set("currentStreak",JSON.stringify({score:streak.score,updated:new Date()}),{sameSite:"Lax",expires:streakExpire});
+            Cookies.set("longestStreak",longestStreak,{sameSite:"Lax",expires:365});
         }
         
         const rGradient = this.state.randomGradient.slice();
@@ -456,8 +474,7 @@ class Board extends React.Component{
 class Game extends React.Component{
     cookiesAccepted(e){
         Cookies.set("refreshCount",refresh,{sameSite:"Lax",expires:expireDate});
-        Cookies.set("currentStreak",JSON.stringify({score:streak.score,updated:new Date()}),{sameSite:"Lax",expires:streakExpire});
-        Cookies.set("longestStreak",longestStreak,{sameSite:"Lax",expires:365});
+        
     }
     render(){
         return(
