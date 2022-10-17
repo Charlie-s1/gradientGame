@@ -4,7 +4,9 @@ import Gradient from "javascript-color-gradient";
 import seedrandom from "seedrandom";
 import CookieConsent, {Cookies, getCookieConsentValue} from "react-cookie-consent";
 import "./index.css";
-import ReactGA from 'react-ga4';
+import ReactGA from "react-ga4";
+import {Chart} from "chart.js/auto";
+import {Bar} from "react-chartjs-2";
 
 const firstPuzzle = new Date("2022/08/17");
 const startPuzzle = new Date();
@@ -19,6 +21,16 @@ expireDate.setSeconds(0);
 const streakExpire = new Date(expireDate);
 streakExpire.setDate(expireDate.getDate()+1);
 
+const scores = {
+    "goodTime" : 30,
+    "okayTime" : 60,
+    "goodTurns" : 10,
+    "okayTurns" : 15,
+    "goodRefresh" : 1,
+    "okayRefresh" : 3,
+}
+
+let savedStats = Cookies.get("savedStats") ? JSON.parse(Cookies.get("savedStats")) : {"good":0,"okay":0,"bad":0,"updated":0};
 let refresh = Cookies.get("refreshCount") ? +Cookies.get("refreshCount") + 1 : 1;
 let savedScore = Cookies.get("savedScore") || null;
 let streak = Cookies.get("currentStreak") ? JSON.parse(Cookies.get("currentStreak")) : {"score":1,"updated":new Date()};
@@ -80,6 +92,38 @@ class RenderDoneScreen extends React.Component{
             puzzleNum:Math.floor(tDiff/(1000*3600*24)),
             timeTaken:statsInfo ? Math.abs((new Date(statsInfo.timeStart).getTime() - new Date(statsInfo.timeFin).getTime())/1000) : null
         }
+
+    }
+    setStats(){
+        const timeTaken = Math.abs((this.props.start-this.props.finish)/1000);
+        const turns = this.state.stats ? this.state.stats.turnsTaken : this.props.turns;
+        const time = this.state.stats ? this.state.timeTaken : timeTaken;
+        const refreshes = this.state.stats ? this.state.stats.refreshes : refresh;
+
+        function getScores(n,good,okay){
+            if(n<=good){
+                return "good"
+            }else if(n<=okay){
+                return "okay"
+            }else{
+                return "bad"
+            }
+        }
+        
+        let emojiScores = [
+            getScores(turns,scores.goodTurns,scores.okayTurns),
+            getScores(time,scores.goodTime,scores.okayTime),
+            getScores(refreshes,scores.goodRefresh,scores.okayRefresh),
+        ]
+        if(new Date(savedStats.updated).toDateString() != new Date().toDateString()){
+            for(const s of emojiScores){
+                savedStats[s]++;
+            }
+            savedStats.updated=new Date();
+        }
+        if(getCookieConsentValue()){
+            Cookies.set("savedStats",savedStats,{sameSite:"Lax",expires:365});
+        }
     }
     
     render(){
@@ -93,6 +137,10 @@ class RenderDoneScreen extends React.Component{
         const turns = this.state.stats ? this.state.stats.turnsTaken : this.props.turns;
         const time = this.state.stats ? this.state.timeTaken : timeTaken;
         const refreshes = this.state.stats ? this.state.stats.refreshes : refresh;
+
+        if(this.props.done){
+           this.setStats();
+        }
         return(
             <div id="completeGradient" style={{display:this.props.done ? "flex" : "none", background:`linear-gradient(${this.props.completeG[0]},${this.props.completeG[this.props.completeG.length-1]})`}}>
                 <div id="doneScreenCont">
@@ -114,15 +162,69 @@ class RenderDoneScreen extends React.Component{
                                 </div>
                             </div>
                         </div>
+                        <Bar
+                            data={{
+                                labels:["\u{1f525}","\u{1f62c}","\u{1f922}"],
+                                datasets:[{
+                                    data:[savedStats.good,savedStats.okay,savedStats.bad],
+                                    label:"",
+                                    backgroundColor:["#ffffff85"]
+                                }],
+                            }}
+                            options={{
+                                scales:{
+                                    xAxes:{
+                                        ticks:{
+                                            display:false,
+                                            color:"white"
+                                        },
+                                        grid:{
+                                            drawBorder:false,
+                                            display:false,
+                                        }
+                                    },
+                                    yAxes:{
+                                        grid:{
+                                            drawBorder:false,
+                                            display:false,
+                                        },
+                                        ticks:{
+                                            font:{
+                                                size:20,
+                                            }
+                                        }
+                                    }
+                                },
+                                animation:{
+                                    duration:0,
+                                },
+                                plugins:{
+                                    tooltip:{
+                                        displayColors:false,
+                                        callbacks:{
+                                            title:function(){},
+                                            label:function(context){
+                                                return `${context.label} ${context.parsed.x}`
+                                            },
+                                        },
+                                    },
+                                    legend:{
+                                        display:false
+                                    }
+                                },
+                                indexAxis:"y",
+
+                            }}
+                        />
                         <p id="countDown">Next puzzle in {timeText}</p>
                         <button id="share" onClick={(e)=>share(e,this.state.puzzleNum,turns,time,refreshes)}>Share</button>
                         <p id="copyMsg">Copied to Clipboard</p>
 
                     </div>
                     <div id="footer">
-                        <div id="emailCont">
+                        {/* <div id="emailCont">
                             <p>Suggestions? Please send them to <u>gradient.game@charlie-s.com</u></p>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>
@@ -140,12 +242,11 @@ async function share(e,puzzleNum,turns,time,refreshes){
     }
     const shareData = {
         title:"Gradient Game",
-        text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}  ${chooseEmoji(turns,10,15)}\nTries:   ${refreshes} ${chooseEmoji(refreshes,1,3)}\nTime:   ${time}sec  ${chooseEmoji(time,30,60)}\n`,
+        text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}  ${chooseEmoji(turns,scores.goodTurns,scores.okayTurns)}\nTries:   ${refreshes} ${chooseEmoji(refreshes,scores.goodRefresh,scores.okayRefresh)}\nTime:   ${time}sec  ${chooseEmoji(time,scores.goodTime,scores.okayTime)}\n`,
         url:"https://charlie-s.com/gradientGame"
     }
     
     function chooseEmoji(num,best,good){
-        console.log(num<=good);
         if(num<=best){
             return emojis.best;
         }else if(num<=good){
@@ -168,7 +269,7 @@ async function share(e,puzzleNum,turns,time,refreshes){
         })   
     }catch(err){
         try{
-            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns:  ${turns} ${chooseEmoji(turns,10,15,20)}\nTries:   ${refreshes} ${chooseEmoji(refreshes,1,3,5)}\nTime:   ${time}sec ${chooseEmoji(time,30,60,110)}\nhttps://charlie-s.com/gradientGame`);
+            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns:  ${turns} ${chooseEmoji(turns,scores.goodTurns,scores.okayTurns)}\nTries:   ${refreshes} ${chooseEmoji(refreshes,scores.goodRefresh,scores.okayRefresh)}\nTime:   ${time}sec ${chooseEmoji(time,scores.goodTime,scores.okayTime)}\nhttps://charlie-s.com/gradientGame`);
             shareMsg.textContent = "Copied to Clipboard"
             document.querySelector("#copyMsg").style.visibility = "visible";    
             ReactGA.event({
