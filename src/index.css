@@ -34,7 +34,7 @@ body{
     z-index: 999;
     color:white;
     font-family: sans-serif;
-    padding:1rem;
+    padding:2rem;
     border-radius: 1rem;
     background: #13191c8e;
     backdrop-filter: blur(10px);
@@ -44,8 +44,16 @@ body{
 #doneText{
     text-align: center;
 }
-#doneText >p{
-    font-size: 1.5rem;
+#puzzle{
+    margin:.5rem 0 1.5rem 0;
+}
+#score{
+    display:flex;
+    justify-content: space-between;
+}
+#score p{
+    font-size: 1.25rem;
+    margin: .5rem 0;
 }
 #copyMsg{
     visibility: hidden;
@@ -78,9 +86,6 @@ body{
     width:5rem;
     font-size:1.5rem;
     cursor: pointer;
-}
-#doneText h1{
-    margin-bottom:1rem;
 }
 #footer{
     position:absolute;

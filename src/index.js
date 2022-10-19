@@ -79,6 +79,20 @@ function RenderHelpScreen(props){
 /**
  * Create finish screen and allow user to share
  */
+function chooseEmoji(num,best,good){
+    const emojis = {
+        "best":"\u{1f525}",
+        "good":"\u{1f62c}",
+        "bad":"\u{1f922}",
+    }
+    if(num<=best){
+        return emojis.best;
+    }else if(num<=good){
+        return emojis.good;
+    }else{
+        return emojis.bad;
+    }
+}
 class RenderDoneScreen extends React.Component{
     constructor(props){
         const date=new Date();
@@ -145,10 +159,21 @@ class RenderDoneScreen extends React.Component{
             <div id="completeGradient" style={{display:this.props.done ? "flex" : "none", background:`linear-gradient(${this.props.completeG[0]},${this.props.completeG[this.props.completeG.length-1]})`}}>
                 <div id="doneScreenCont">
                     <div id="doneText">
-                        <h1>Puzzle {this.state.puzzleNum}</h1>
-                        <p>Completed in {turns} turns</p>
-                        <p>and took {time} seconds</p>
-                        <p>with {refreshes} {(refreshes)>1?"tries":"try"}</p>
+                        <h1 id="puzzle">Puzzle {this.state.puzzleNum}</h1>
+                        <div id="score">
+                            <div>
+                                <h3>Turns</h3>
+                                <p>{turns}{chooseEmoji(turns,scores.goodTurns,scores.okayTurns)}</p>
+                            </div>
+                            <div>
+                                <h3>Time (sec)</h3>
+                                <p>{time}{chooseEmoji(time,scores.goodTime,scores.okayTime)}</p>
+                            </div>
+                            <div>
+                                <h3>Tries</h3>
+                                <p>{refreshes}{chooseEmoji(refreshes,scores.goodRefresh,scores.okayRefresh)}</p>
+                            </div>
+                        </div>
                         <div id="stats">
                             <h3>Streak</h3>
                             <div id="streakData">
@@ -235,26 +260,14 @@ class RenderDoneScreen extends React.Component{
  * Share score or copy to clipboard if cannot share
  */
 async function share(e,puzzleNum,turns,time,refreshes){
-    const emojis = {
-        "best":"\u{1f525}",
-        "good":"\u{1f62c}",
-        "bad":"\u{1f922}",
-    }
+    
     const shareData = {
         title:"Gradient Game",
         text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}  ${chooseEmoji(turns,scores.goodTurns,scores.okayTurns)}\nTries:   ${refreshes} ${chooseEmoji(refreshes,scores.goodRefresh,scores.okayRefresh)}\nTime:   ${time}sec  ${chooseEmoji(time,scores.goodTime,scores.okayTime)}\n`,
         url:"https://charlie-s.com/gradientGame"
     }
     
-    function chooseEmoji(num,best,good){
-        if(num<=best){
-            return emojis.best;
-        }else if(num<=good){
-            return emojis.good;
-        }else{
-            return emojis.bad;
-        }
-    }
+    
     const shareMsg = document.querySelector("#copyMsg")
     try{
         if(navigator.userAgent.toLowerCase().indexOf('firefox')>-1){
