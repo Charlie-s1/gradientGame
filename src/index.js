@@ -29,6 +29,11 @@ const scores = {
     "goodRefresh" : 1,
     "okayRefresh" : 3,
 }
+const emojis = {
+    "best":"\u{1f525}",
+    "good":"\u{1f62c}",
+    "bad":"\u{1f922}",
+}
 
 let savedStats = Cookies.get("savedStats") ? JSON.parse(Cookies.get("savedStats")) : {"good":0,"okay":0,"bad":0,"updated":0};
 let refresh = Cookies.get("refreshCount") ? +Cookies.get("refreshCount") + 1 : 1;
@@ -68,10 +73,34 @@ function RenderHelpScreen(props){
                 <p id="closeHelp" onClick={()=>document.querySelector("#helpScreenCont").style.display = "none"}>X</p>
                 <h1>How To Play</h1>
                 <br></br>
-                <p>Complete the gradient in as little turns as possible</p>
-                <p>Click/Tap on the boxes on the right of the screen to fill the selected colour from the left into it</p>
-                <p>The box on the right will change appearance when it is correct</p>
-                <p>Keep going until all of the boxes are correct</p>
+                <p class="helpItem">Complete the gradient in as little turns as possible</p>
+                <p class="helpItem">Click/Tap on the boxes on the right of the screen to fill the selected colour from the left into it</p>
+                <p class="helpItem">The box on the right will change appearance when it is correct</p>
+                <p class="helpItem">Keep going until all of the boxes are correct</p>
+                <div id="scoreHelp">
+                    <h1>Scoring</h1>
+                    <div id="emojiTable">
+                        <div id="turnScoring">
+                            <h3>Turns</h3>
+                            <p>{emojis.best} {scores.goodTurns}</p>
+                            <p>{emojis.good} {scores.goodTurns+1} - {scores.okayTurns}</p>
+                            <p>{emojis.bad}  {scores.okayTurns}+</p>
+                        </div>
+                        <div id="timeScoring">
+                            <h3>Time</h3>
+                            <p>{emojis.best} {scores.goodTime} seconds</p>
+                            <p>{emojis.good} {scores.goodTime+1} - {scores.okayTime} seconds</p>
+                            <p>{emojis.bad} {scores.okayTime}+ seconds</p>
+                        </div>
+                        <div id="tryScoring">
+                            <h3>Tries</h3>
+                            <p>{emojis.best} {scores.goodRefresh}</p>
+                            <p>{emojis.good} {scores.goodRefresh+1} - {scores.okayRefresh}</p>
+                            <p>{emojis.bad} {scores.okayRefresh}+</p>
+                        </div>
+                    </div>
+                    
+                </div>
             </div>
         </div>
     )
@@ -80,11 +109,7 @@ function RenderHelpScreen(props){
  * Create finish screen and allow user to share
  */
 function chooseEmoji(num,best,good){
-    const emojis = {
-        "best":"\u{1f525}",
-        "good":"\u{1f62c}",
-        "bad":"\u{1f922}",
-    }
+    
     if(num<=best){
         return emojis.best;
     }else if(num<=good){
@@ -577,9 +602,12 @@ class Board extends React.Component{
                     <line x1="42" y1="13" x2="34" y2="22" stroke="white" strokeWidth="3"/>
                 </svg>
                 <p id="turnCount">{this.state.turnsTaken}</p>
-                <p id="helpToggle" onClick={(e)=>{
-                    document.querySelector("#helpScreenCont").style.display = "flex"
-                }}>?</p>
+                <div id="helpToggleCont" onClick={(e)=>{
+                        document.querySelector("#helpScreenCont").style.display = "flex"
+                    }}>
+                    <p id="helpToggle" >?</p>
+                </div>
+                
             </div>
         )
     }
