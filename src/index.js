@@ -84,19 +84,19 @@ function RenderHelpScreen(props){
                             <h3>Turns</h3>
                             <p>{emojis.best} {scores.goodTurns}</p>
                             <p>{emojis.good} {scores.goodTurns+1} - {scores.okayTurns}</p>
-                            <p>{emojis.bad}  {scores.okayTurns}+</p>
+                            <p>{emojis.bad}  {scores.okayTurns+1}+</p>
                         </div>
                         <div id="timeScoring">
-                            <h3>Time</h3>
-                            <p>{emojis.best} {scores.goodTime} seconds</p>
-                            <p>{emojis.good} {scores.goodTime+1} - {scores.okayTime} seconds</p>
-                            <p>{emojis.bad} {scores.okayTime}+ seconds</p>
+                            <h3>Time (sec)</h3>
+                            <p>{emojis.best} {scores.goodTime}</p>
+                            <p>{emojis.good} {scores.goodTime+1} - {scores.okayTime}</p>
+                            <p>{emojis.bad} {scores.okayTime+1}+</p>
                         </div>
                         <div id="tryScoring">
                             <h3>Tries</h3>
                             <p>{emojis.best} {scores.goodRefresh}</p>
                             <p>{emojis.good} {scores.goodRefresh+1} - {scores.okayRefresh}</p>
-                            <p>{emojis.bad} {scores.okayRefresh}+</p>
+                            <p>{emojis.bad} {scores.okayRefresh+1}+</p>
                         </div>
                     </div>
                     

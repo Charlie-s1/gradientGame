@@ -32,6 +32,7 @@ body{
 }
 #doneScreenCont{
     z-index: 999;
+    width:20%;
     color:white;
     font-family: sans-serif;
     padding:2rem;
@@ -49,7 +50,7 @@ body{
 }
 #score{
     display:flex;
-    justify-content: space-between;
+    justify-content: space-around;
 }
 #score p{
     font-size: 1.25rem;
@@ -176,6 +177,7 @@ body{
     background: #13191c8e;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    box-shadow: 4px 4px 30px #00000030;
     border-radius: 100%;
     width: 2.5em;
     height:2.5rem;
@@ -232,6 +234,9 @@ body{
     #board{
         display:flex;
         justify-content: center;
+    }
+    #doneScreenCont{
+        width:70%;
     }
     #toDo{
         display:flex;
