@@ -73,10 +73,10 @@ function RenderHelpScreen(props){
                 <p id="closeHelp" onClick={()=>document.querySelector("#helpScreenCont").style.display = "none"}>X</p>
                 <h1>How To Play</h1>
                 <br></br>
-                <p class="helpItem">Complete the gradient in as little turns as possible</p>
-                <p class="helpItem">Click/Tap on the boxes on the right of the screen to fill the selected colour from the left into it</p>
-                <p class="helpItem">The box on the right will change appearance when it is correct</p>
-                <p class="helpItem">Keep going until all of the boxes are correct</p>
+                <p className="helpItem">Complete the gradient in as little turns as possible</p>
+                <p className="helpItem">Click/Tap on the boxes on the right of the screen to fill the selected colour from the left into it</p>
+                <p className="helpItem">The box on the right will change appearance when it is correct</p>
+                <p className="helpItem">Keep going until all of the boxes are correct</p>
                 <div id="scoreHelp">
                     <h1>Scoring</h1>
                     <div id="emojiTable">
@@ -452,7 +452,10 @@ class Board extends React.Component{
             let currentIndex = randomG.length,  randomIndex;
 
             while (currentIndex != 0) {
-                randomIndex = Math.floor(Math.random() * currentIndex);
+                let numByTurn = seedrandom(currentIndex + "" + refresh);
+                console.log(refresh);
+                randomIndex = Math.floor(numByTurn() * currentIndex);
+                // randomIndex = Math.floor(Math.random() * currentIndex);
                 currentIndex--;
             
                 [randomG[currentIndex], randomG[randomIndex]] = [
