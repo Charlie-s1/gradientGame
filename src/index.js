@@ -108,8 +108,16 @@ function RenderHelpScreen(props){
 /**
  * Create finish screen and allow user to share
  */
-function chooseEmoji(num,best,good){
-    
+function chooseEmoji(num,best,good,reverse){
+    if(reverse){
+        if(num>=best){
+            return emojis.best;
+        }else if(num>=good){
+            return emojis.good;
+        }else{
+            return emojis.bad;
+        }
+    }
     if(num<=best){
         return emojis.best;
     }else if(num<=good){
@@ -161,7 +169,7 @@ class RenderDoneScreen extends React.Component{
             savedStats.updated=new Date();
         }
         if(getCookieConsentValue()){
-            Cookies.set("savedStats",savedStats,{sameSite:"Lax",expires:365});
+            Cookies.set("savedStats",savedStats,{SameSite:"Lax",expires:365});
         }
     }
     
@@ -203,7 +211,7 @@ class RenderDoneScreen extends React.Component{
                             <h3>Streak</h3>
                             <div id="streakData">
                                 <div id="curStreak">
-                                    <p>{streak.score} {longestStreak<3?emojis.bad : chooseEmoji(streak.score,longestStreak/2,longestStreak)}</p>
+                                    <p>{streak.score} {longestStreak<3?emojis.bad : chooseEmoji(streak.score,+(longestStreak/2),longestStreak,true)}</p>
                                     <p id="curStreak">Current</p>
                                 </div>
                                 <div id="maxStreak">
@@ -288,7 +296,7 @@ async function share(e,puzzleNum,turns,time,refreshes){
     
     const shareData = {
         title:"Gradient Game",
-        text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}  ${chooseEmoji(turns,scores.goodTurns,scores.okayTurns)}\nTries:   ${refreshes} ${chooseEmoji(refreshes,scores.goodRefresh,scores.okayRefresh)}\nTime:   ${time}sec  ${chooseEmoji(time,scores.goodTime,scores.okayTime)}\nStreak: ${streak.score} ${longestStreak<3?emojis.bad : chooseEmoji(streak.score,longestStreak/2,longestStreak)}\n`,
+        text:`Puzzle: ${puzzleNum}\nTurns:  ${turns}  ${chooseEmoji(turns,scores.goodTurns,scores.okayTurns)}\nTries:   ${refreshes} ${chooseEmoji(refreshes,scores.goodRefresh,scores.okayRefresh)}\nTime:   ${time}sec  ${chooseEmoji(time,scores.goodTime,scores.okayTime)}\nStreak: ${streak.score}/${longestStreak} ${longestStreak<3?emojis.bad : chooseEmoji(streak.score,+(longestStreak/2),longestStreak,true)}\n`,
         url:"https://charlie-s.com/gradientGame"
     }
     
@@ -307,7 +315,7 @@ async function share(e,puzzleNum,turns,time,refreshes){
         })   
     }catch(err){
         try{
-            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns:  ${turns} ${chooseEmoji(turns,scores.goodTurns,scores.okayTurns)}\nTries:   ${refreshes} ${chooseEmoji(refreshes,scores.goodRefresh,scores.okayRefresh)}\nTime:   ${time}sec ${chooseEmoji(time,scores.goodTime,scores.okayTime)}\nStreak: ${streak.score} ${longestStreak<3?emojis.bad : chooseEmoji(streak.score,longestStreak/2,longestStreak)}\nhttps://charlie-s.com/gradientGame`);
+            await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns:  ${turns} ${chooseEmoji(turns,scores.goodTurns,scores.okayTurns)}\nTries:   ${refreshes} ${chooseEmoji(refreshes,scores.goodRefresh,scores.okayRefresh)}\nTime:   ${time}sec ${chooseEmoji(time,scores.goodTime,scores.okayTime)}\nStreak: ${streak.score}/${longestStreak} ${longestStreak<3?emojis.bad : chooseEmoji(streak.score,+(longestStreak/2),longestStreak,true)}\nhttps://charlie-s.com/gradientGame`);
             shareMsg.textContent = "Copied to Clipboard"
             document.querySelector("#copyMsg").style.visibility = "visible";    
             ReactGA.event({
@@ -453,7 +461,6 @@ class Board extends React.Component{
 
             while (currentIndex != 0) {
                 let numByTurn = seedrandom(currentIndex + "" + refresh);
-                console.log(refresh);
                 randomIndex = Math.floor(numByTurn() * currentIndex);
                 // randomIndex = Math.floor(Math.random() * currentIndex);
                 currentIndex--;
@@ -478,7 +485,7 @@ class Board extends React.Component{
                 }),
                 {sameSite:"Lax",expires:expireDate}
             )
-            Cookies.set("refreshCount",refresh,{sameSite:"Lax",expires:expireDate});
+            
             Cookies.set("currentStreak",JSON.stringify({score:streak.score,updated:new Date()}),{sameSite:"Lax",expires:streakExpire});
             Cookies.set("longestStreak",longestStreak,{sameSite:"Lax",expires:365});
         }
@@ -618,8 +625,10 @@ class Board extends React.Component{
 
 class Game extends React.Component{
     cookiesAccepted(e){
-        Cookies.set("refreshCount",refresh,{sameSite:"Lax",expires:expireDate});
-        
+        const now = new Date();
+        let nowPlusHr = new Date();
+        nowPlusHr.setHours(+now.getHours()+1);
+        Cookies.set("refreshCount",refresh,{sameSite:"Lax",expires:now.getHours()>=22 ? expireDate : nowPlusHr});
     }
     render(){
         return(
