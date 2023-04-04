@@ -56,11 +56,7 @@ body{
     font-size: 1.25rem;
     margin: .5rem 0;
 }
-#copyMsg{
-    visibility: hidden;
-    margin-top:1.5rem;
-    font-size: 1rem !important;
-}
+
 #stats{
     border-top:1px solid white;
     margin:1rem;
@@ -77,28 +73,66 @@ body{
     margin-top:.5rem;
     font-size: 1.2rem !important;
 }
-#doneText>button{
+#shareCont{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin:1.5rem 0 2rem 0;
+    width:100%;
+}
+#shareCont>button{
     background:white;
     border-radius: .5rem;
     border:none;
-    margin-top:2rem;
     color:#101018;
     height: 2.5rem;
     width:5rem;
     font-size:1.5rem;
     cursor: pointer;
 }
+#copyMsg{
+    font-size: 1rem !important;
+    width:0;
+    display:none;
+    transition: 1s;
+}
 #footer{
-    position:absolute;
-    bottom:1rem;
-    left:50%;
-    transform: translate(-50%);
+    position:relative;
+    width:100%;
     display:flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     gap: .5rem;
     width:100%;
+}
+#footer button{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    border:none;
+    background:none;
+    cursor:pointer;
+    width:66%;
+    border-radius:10px;
+    transition: .25s;
+    -webkit-tap-highlight-color: transparent;
+}
+#footer button:hover{
+    background:#FF5E5B;
+}
+#footer button:focus{
+    outline:none !important;
+    user-select: none;
+}
+#footer button img{
+    width:25%;
+    margin:.5rem;
+}
+#footer button p{
+    color:white;
+    cursor:pointer;
+    font-weight: 1000;
 }
 #supportCont{
     display:flex;
@@ -237,6 +271,7 @@ body{
     }
     #doneScreenCont{
         width:70%;
+        padding:.75rem 2rem;
     }
     #toDo{
         display:flex;

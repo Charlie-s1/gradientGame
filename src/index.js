@@ -275,11 +275,19 @@ class RenderDoneScreen extends React.Component{
                             }}
                         />
                         <p id="countDown">Next puzzle in {timeText}</p>
-                        <button id="share" onClick={(e)=>share(e,this.state.puzzleNum,turns,time,refreshes)}>Share</button>
-                        <p id="copyMsg">Copied to Clipboard</p>
+                        <div id="shareCont">
+                            <button onClick={(e)=>share(e,this.state.puzzleNum,turns,time,refreshes)}>Share</button>
+                            <p id="copyMsg"></p>
+                        </div>
+                        
 
                     </div>
                     <div id="footer">
+                        <p>Enjoying the game?</p>
+                        <button onClick={(e)=>{window.location.href="https://ko-fi.com/charlie_s"}}>
+                            <img src="https://storage.ko-fi.com/cdn/cup-border.png"/>
+                            <p>Leave a tip!</p>
+                        </button>
                         {/* <div id="emailCont">
                             <p>Suggestions? Please send them to <u>gradient.game@charlie-s.com</u></p>
                         </div> */}
@@ -308,7 +316,8 @@ async function share(e,puzzleNum,turns,time,refreshes){
         }
         await navigator.share(shareData)
         shareMsg.textContent = "Share Successful"
-        shareMsg.style.visibility = "visible";
+        shareMsg.width = "auto";
+        shareMsg.width = "block";
         ReactGA.event({
             category:"share",
             action:"share"
@@ -316,8 +325,9 @@ async function share(e,puzzleNum,turns,time,refreshes){
     }catch(err){
         try{
             await navigator.clipboard.writeText(`Puzzle: ${puzzleNum}\nTurns:  ${turns} ${chooseEmoji(turns,scores.goodTurns,scores.okayTurns)}\nTries:   ${refreshes} ${chooseEmoji(refreshes,scores.goodRefresh,scores.okayRefresh)}\nTime:   ${time}sec ${chooseEmoji(time,scores.goodTime,scores.okayTime)}\nStreak: ${streak.score}/${longestStreak} ${longestStreak<3?emojis.bad : chooseEmoji(streak.score,+(longestStreak/2),longestStreak,true)}\nhttps://charlie-s.com/gradientGame`);
-            shareMsg.textContent = "Copied to Clipboard"
-            document.querySelector("#copyMsg").style.visibility = "visible";    
+            shareMsg.textContent = "Copied to Clipboard";
+            document.querySelector("#copyMsg").style.width = "auto";    
+            document.querySelector("#copyMsg").style.display = "block";    
             ReactGA.event({
                 category:"copyScore",
                 action:"copyScore"
@@ -446,7 +456,7 @@ class Board extends React.Component{
             .setColorGradient(`#${this.randomColour(0)}`,`#${this.randomColour(1)}`)
             .getColors();
 
-        return newGradient
+        return newGradient;
     }
 /**
  * randomise gradient and return a box for each colour using RenderBox
@@ -460,13 +470,13 @@ class Board extends React.Component{
             let currentIndex = randomG.length,  randomIndex;
 
             while (currentIndex != 0) {
-                let numByTurn = seedrandom(currentIndex + "" + refresh);
+                let numByTurn = seedrandom(startPuzzle.toDateString() + currentIndex + "" + refresh);
                 randomIndex = Math.floor(numByTurn() * currentIndex);
                 // randomIndex = Math.floor(Math.random() * currentIndex);
                 currentIndex--;
             
-                [randomG[currentIndex], randomG[randomIndex]] = [
-                randomG[randomIndex], randomG[currentIndex]];
+                [randomG[currentIndex], randomG[randomIndex]] = [randomG[randomIndex], randomG[currentIndex]];
+
             }
             this.state.randomGradient = randomG;
         }
