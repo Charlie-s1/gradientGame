@@ -17,7 +17,7 @@ const EndScreen = ({ userGrid, forcedEmoji }: { userGrid: box[]; forcedEmoji?: s
 
   const [timeLeft, setTimeLeft] = useState(getTimeUntilNextPuzzle());
 
-  const shareText = `Gradient Grid #${puzzleNumber}\n🔥 Streak: ${streak}\n\n${scoreEmoji}`;
+  const shareText = `Gradient Grid #${puzzleNumber}\n🔥 Streak: ${streak}\n\n${scoreEmoji}\n`;
 
   useEffect(() => {
     markCompletedToday();
@@ -45,7 +45,7 @@ const EndScreen = ({ userGrid, forcedEmoji }: { userGrid: box[]; forcedEmoji?: s
       }
       throw new Error("Share not supported");
     } catch {
-      await navigator.clipboard.writeText(shareText + "\nhttps://charlie-s.com/gradientGame");
+      await navigator.clipboard.writeText(shareText + "https://charlie-s.com/gradientGame");
       setShareStatus("copied");
     }
 

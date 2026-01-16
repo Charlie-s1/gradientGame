@@ -1,12 +1,19 @@
+import { useEffect } from "react";
 import { useGradientGame } from "../hooks/useGradientGame";
 import { getTodayResult, hasCompletedToday } from "../utils/Scoring";
 import RenderBox from "./Box";
 import { EndScreen } from "./EndScreen";
+import { initGA, logPageView } from "../utils/logging";
 // import HelpScreen from "./HelpScreen";
 
 function App() {
   const game = useGradientGame();
   const savedResult = getTodayResult();
+
+  useEffect(() => {
+    initGA();
+    logPageView();
+  }, []);
 
   return (
     <div className=" h-dvh w-screen flex flex-col justify-between pb-5 bg-gray-800">

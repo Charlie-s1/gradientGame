@@ -1,4 +1,5 @@
 import type { box } from "../hooks/useGradientGame";
+import { logEvent } from "./logging";
 
 const START_DATE = new Date("2026-01-16T00:00:00Z");
 
@@ -58,6 +59,7 @@ const markCompletedToday = () => {
 };
 
 const hasCompletedToday = () => {
+  logEvent("Game", "Puzzle Completed", `Puzzle #${getPuzzleNumber()}`);
   return localStorage.getItem("completedPuzzle") === new Date().toDateString();
 };
 
