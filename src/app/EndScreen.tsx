@@ -17,7 +17,7 @@ const EndScreen = ({ userGrid, forcedEmoji }: { userGrid: box[]; forcedEmoji?: s
 
   const [timeLeft, setTimeLeft] = useState(getTimeUntilNextPuzzle());
 
-  const shareText = `Gradient Grid #${puzzleNumber}\n🔥 Streak: ${streak}\n\n${scoreEmoji}`;
+  const shareText = `Gradient Grid #${puzzleNumber}\n🔥 Streak: ${streak}\n\n${scoreEmoji}\nhttps://charlie-s.com/gradientGame`;
 
   useEffect(() => {
     markCompletedToday();
@@ -32,8 +32,9 @@ const EndScreen = ({ userGrid, forcedEmoji }: { userGrid: box[]; forcedEmoji?: s
 
   const handleShare = async () => {
     const shareData = {
-      title: `Gradient Grid #${puzzleNumber}`,
+      title: `Gradient Game #${puzzleNumber}`,
       text: shareText,
+      url: "https://charlie-s.com/gradientGame",
     };
 
     try {

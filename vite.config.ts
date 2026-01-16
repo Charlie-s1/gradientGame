@@ -7,5 +7,6 @@ export default defineConfig({
   server: {
     host: true,
   },
+  base: "/gradientGame/",
   plugins: [react(), tailwindcss()],
 });
