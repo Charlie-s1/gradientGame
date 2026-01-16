@@ -17,7 +17,7 @@ const EndScreen = ({ userGrid, forcedEmoji }: { userGrid: box[]; forcedEmoji?: s
 
   const [timeLeft, setTimeLeft] = useState(getTimeUntilNextPuzzle());
 
-  const shareText = `Gradient Grid #${puzzleNumber}\n🔥 Streak: ${streak}\n\n${scoreEmoji}\nhttps://charlie-s.com/gradientGame`;
+  const shareText = `Gradient Grid #${puzzleNumber}\n🔥 Streak: ${streak}\n\n${scoreEmoji}`;
 
   useEffect(() => {
     markCompletedToday();
@@ -32,7 +32,7 @@ const EndScreen = ({ userGrid, forcedEmoji }: { userGrid: box[]; forcedEmoji?: s
 
   const handleShare = async () => {
     const shareData = {
-      title: `Gradient Game #${puzzleNumber}`,
+      title: `Gradient Grid #${puzzleNumber}`,
       text: shareText,
       url: "https://charlie-s.com/gradientGame",
     };
@@ -45,7 +45,7 @@ const EndScreen = ({ userGrid, forcedEmoji }: { userGrid: box[]; forcedEmoji?: s
       }
       throw new Error("Share not supported");
     } catch {
-      await navigator.clipboard.writeText(shareText);
+      await navigator.clipboard.writeText(shareText + "\nhttps://charlie-s.com/gradientGame");
       setShareStatus("copied");
     }
 
@@ -54,9 +54,9 @@ const EndScreen = ({ userGrid, forcedEmoji }: { userGrid: box[]; forcedEmoji?: s
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md">
-      <div className="w-full max-w-sm rounded-2xl p-6 text-white shadow-xl">
+      <div className="w-full max-w-sm rounded-2xl p-6 text-white">
         {/* Title */}
-        <h1 className="text-center text-3xl font-bold">Gradient Game</h1>
+        <h1 className="text-center text-3xl font-bold">Gradient Grid</h1>
         <p className="text-center text-sm text-gray-400">Puzzle #{puzzleNumber}</p>
 
         {/* Emoji Grid */}
