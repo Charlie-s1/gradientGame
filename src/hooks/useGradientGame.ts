@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { generateGrid } from "../utils/generateGradient";
-import Gradient from "javascript-color-gradient";
 
 export type box = {
   col: string | null;
