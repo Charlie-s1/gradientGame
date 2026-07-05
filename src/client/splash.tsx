@@ -77,7 +77,7 @@ export const Splash = ({
         <button
           className={` ${hasCompletedToday(userData.gameData.completedPuzzleDate) ? "opacity-50 cursor-default!" : "hover:bg-[#c23300] dark:hover:bg-orange-700"} flex items-center justify-center bg-[#d93900] dark:bg-orange-600 text-white w-auto h-10 rounded-full cursor-pointer transition-colors px-4`}
           onClick={() =>
-            !hasCompletedToday(userData.gameData.completedPuzzleDate) &&
+            hasCompletedToday(userData.gameData.completedPuzzleDate) &&
             onStart()
           }
         >

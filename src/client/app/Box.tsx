@@ -19,7 +19,7 @@ const RenderBox = ({
       className={`w-full h-full p-1 rounded-md 
         ${correct ? "border-0! cursor-default!" : ""}
         ${onClick ? "cursor-pointer " : ""} ${
-          selected ? "ring-2 ring-gray-900 dark:ring-white m-1" : ""
+          selected ? "ring-2 ring-slate-800 dark:ring-slate-100 m-1" : ""
         } ${customStyle}`}
     >
       <div
