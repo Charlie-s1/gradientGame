@@ -9,4 +9,5 @@ export interface UserStats {
   lastPlayed: string | null;
   completedPuzzleDate: string | null;
   dailyResult: { date: string; emojiGrid: string } | null;
+  timeSpent: number;
 }

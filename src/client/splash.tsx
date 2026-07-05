@@ -7,9 +7,11 @@ import { App } from "./app/Game";
 import { UserData } from "../shared/types";
 import {
   buildEmojiGrid,
+  getPuzzleNumber,
   getTimeUntilNextPuzzle,
   hasCompletedToday,
 } from "./utils/Scoring";
+import { ShareScreen } from "./app/ShareScreen";
 
 export const Splash = ({
   userData,
@@ -19,6 +21,7 @@ export const Splash = ({
   onStart: () => void;
 }) => {
   const [timeLeft, setTimeLeft] = useState(getTimeUntilNextPuzzle());
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -30,6 +33,17 @@ export const Splash = ({
 
   return (
     <div className="flex relative flex-col justify-center items-center min-h-screen gap-4 bg-slate-50 text-slate-800 dark:bg-gray-950 dark:text-slate-100">
+      {hasCompletedToday(userData.gameData.completedPuzzleDate) &&
+        isShareOpen && (
+          <div className="absolute top-4 right-4">
+            <ShareScreen
+              emojiGrid={userData.gameData.dailyResult?.emojiGrid ?? ""}
+              streak={userData.gameData.streak}
+              timeTaken={userData.gameData.timeSpent}
+              onClose={() => setIsShareOpen(false)}
+            />
+          </div>
+        )}
       <div className="flex flex-col justify-center items-center gap-4">
         <div className="flex flex-col gap-3">
           <div className="">
@@ -62,8 +76,11 @@ export const Splash = ({
             </div>
             {hasCompletedToday(userData.gameData.completedPuzzleDate) && (
               <div>
-                <p className="mb-3 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
-                  Today's Result
+                <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+                  #{getPuzzleNumber()} Result in
+                </p>
+                <p className="mb-3 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500 text-center">
+                  {userData.gameData.timeSpent || "N/A"} ms
                 </p>
                 <div className="whitespace-pre-line leading-6 tracking-wide text-center">
                   {userData.gameData.dailyResult?.emojiGrid}
@@ -73,9 +90,17 @@ export const Splash = ({
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-center">
+      <div className="flex items-center gap-2 justify-center">
+        {hasCompletedToday(userData.gameData.completedPuzzleDate) && (
+          <button
+            className="flex items-center justify-center bg-slate-200 dark:bg-slate-300 text-slate-900 dark:text-slate-950 hover:bg-slate-300 dark:hover:bg-slate-900 dark:hover:text-slate-300 font-semibold duration-500 w-auto h-10 rounded-2xl cursor-pointer transition-colors px-4 "
+            onClick={() => setIsShareOpen(!isShareOpen)}
+          >
+            Share
+          </button>
+        )}
         <button
-          className={` ${hasCompletedToday(userData.gameData.completedPuzzleDate) ? "opacity-50 cursor-default!" : "hover:bg-[#c23300] dark:hover:bg-orange-700"} flex items-center justify-center bg-[#d93900] dark:bg-orange-600 text-white w-auto h-10 rounded-full cursor-pointer transition-colors px-4`}
+          className={` ${hasCompletedToday(userData.gameData.completedPuzzleDate) ? "opacity-50 cursor-default!" : "hover:bg-[#c23300] dark:hover:bg-orange-700"} flex items-center justify-center bg-[#d93900] dark:bg-orange-600 text-white font-semibold w-auto h-10 rounded-2xl cursor-pointer transition-colors px-4`}
           onClick={() =>
             hasCompletedToday(userData.gameData.completedPuzzleDate) &&
             onStart()
@@ -108,6 +133,7 @@ const MainApp = () => {
       lastPlayed: null,
       completedPuzzleDate: null,
       dailyResult: null,
+      timeSpent: 0,
     },
   });
   const [playGame, setPlayGame] = useState(false);

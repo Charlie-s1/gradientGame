@@ -39,6 +39,7 @@ app.get("/api/userProfile", async (c) => {
           lastPlayed: null,
           completedPuzzleDate: null,
           dailyResult: null,
+          timeSpent: 0,
         };
 
     return c.json({ ...user, avatarUrl, gameData });
@@ -54,7 +55,7 @@ app.post("/api/saveGameData", async (c) => {
     return c.json({ error: "User not logged in" }, 401);
   }
   try {
-    const { gameData } = await c.req.json();
+    const { gameData, timeSpent } = await c.req.json();
     const today = new Date().toDateString();
     const yesturday = new Date(Date.now() - 86400000).toDateString();
 
@@ -66,6 +67,7 @@ app.post("/api/saveGameData", async (c) => {
           lastPlayed: null,
           completedPuzzleDate: null,
           dailyResult: null,
+          timeSpent: 0,
         };
 
     if (stats.lastPlayed !== today) {
@@ -75,6 +77,7 @@ app.post("/api/saveGameData", async (c) => {
     stats.lastPlayed = today;
     stats.completedPuzzleDate = today;
     stats.dailyResult = { date: today, emojiGrid: gameData };
+    stats.timeSpent = timeSpent;
 
     await redis.set(`userStats:${username}`, JSON.stringify(stats));
     return c.json({ success: true, streak: stats.streak, gameData });

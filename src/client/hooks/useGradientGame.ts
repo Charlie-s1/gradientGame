@@ -15,6 +15,7 @@ const useGradientGame = () => {
   const [user, setUser] = useState<box[]>([]);
   const [turn, setTurn] = useState(0);
   const [isDone, setIsDone] = useState(false);
+  const [startTime] = useState(Date.now());
 
   useEffect(() => {
     const g = generateGrid();
@@ -71,7 +72,7 @@ const useGradientGame = () => {
 
     if (user.every((b, i) => b.col === gradient[i])) {
       setIsDone(true);
-      handleGameCompletion(user);
+      handleGameCompletion(user, Date.now() - startTime);
 
       return;
     }

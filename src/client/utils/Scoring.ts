@@ -79,7 +79,7 @@ const hasCompletedToday = (completedPuzzleDate: string | null) => {
 //   return parsed.date === new Date().toDateString() ? parsed.emojiGrid : null;
 // };
 
-const handleGameCompletion = async (userGrid: box[]) => {
+const handleGameCompletion = async (userGrid: box[], timeTaken: number) => {
   const emojiGrid = buildEmojiGrid(userGrid);
 
   try {
@@ -88,7 +88,7 @@ const handleGameCompletion = async (userGrid: box[]) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ gameData: emojiGrid }),
+      body: JSON.stringify({ gameData: emojiGrid, timeSpent: timeTaken }),
     });
     const data = await res.json();
     if (data.success) {
