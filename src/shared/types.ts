@@ -10,4 +10,5 @@ export interface UserStats {
   completedPuzzleDate: string | null;
   dailyResult: { date: string; emojiGrid: string } | null;
   timeSpent: number;
+  turns: number;
 }

@@ -40,6 +40,10 @@ const getTimeUntilNextPuzzle = () => {
   return { hours, minutes, seconds };
 };
 
+const calculateScore = (turns: number, time: number) => {
+  return turns * 100000 + time;
+};
+
 // const updateStreak = () => {
 //   const today = new Date().toDateString();
 //   const last = localStorage.getItem("lastPlayed");
@@ -79,7 +83,11 @@ const hasCompletedToday = (completedPuzzleDate: string | null) => {
 //   return parsed.date === new Date().toDateString() ? parsed.emojiGrid : null;
 // };
 
-const handleGameCompletion = async (userGrid: box[], timeTaken: number) => {
+const handleGameCompletion = async (
+  userGrid: box[],
+  timeTaken: number,
+  turn: number
+) => {
   const emojiGrid = buildEmojiGrid(userGrid);
 
   try {
@@ -88,7 +96,11 @@ const handleGameCompletion = async (userGrid: box[], timeTaken: number) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ gameData: emojiGrid, timeSpent: timeTaken }),
+      body: JSON.stringify({
+        gameData: emojiGrid,
+        timeSpent: timeTaken,
+        turns: turn,
+      }),
     });
     const data = await res.json();
     if (data.success) {
@@ -104,6 +116,7 @@ export {
   // updateStreak,
   getPuzzleNumber,
   getTimeUntilNextPuzzle,
+  calculateScore,
   // markCompletedToday,
   hasCompletedToday,
   // saveTodayResult,

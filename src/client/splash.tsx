@@ -7,6 +7,7 @@ import { App } from "./app/Game";
 import { UserData } from "../shared/types";
 import {
   buildEmojiGrid,
+  calculateScore,
   getPuzzleNumber,
   getTimeUntilNextPuzzle,
   hasCompletedToday,
@@ -77,10 +78,16 @@ export const Splash = ({
             {hasCompletedToday(userData.gameData.completedPuzzleDate) && (
               <div>
                 <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
-                  #{getPuzzleNumber()} Result in
+                  #{getPuzzleNumber()} Result in{" "}
+                  {userData.gameData.timeSpent / 1000 || "N/A"}
+                  <span className="lowercase">s</span>
                 </p>
                 <p className="mb-3 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500 text-center">
-                  {userData.gameData.timeSpent || "N/A"} ms
+                  score:{" "}
+                  {calculateScore(
+                    userData.gameData.turns,
+                    userData.gameData.timeSpent
+                  )}
                 </p>
                 <div className="whitespace-pre-line leading-6 tracking-wide text-center">
                   {userData.gameData.dailyResult?.emojiGrid}
@@ -102,7 +109,7 @@ export const Splash = ({
         <button
           className={` ${hasCompletedToday(userData.gameData.completedPuzzleDate) ? "opacity-50 cursor-default!" : "hover:bg-[#c23300] dark:hover:bg-orange-700"} flex items-center justify-center bg-[#d93900] dark:bg-orange-600 text-white font-semibold w-auto h-10 rounded-2xl cursor-pointer transition-colors px-4`}
           onClick={() =>
-            hasCompletedToday(userData.gameData.completedPuzzleDate) &&
+            !hasCompletedToday(userData.gameData.completedPuzzleDate) &&
             onStart()
           }
         >
@@ -134,20 +141,25 @@ const MainApp = () => {
       completedPuzzleDate: null,
       dailyResult: null,
       timeSpent: 0,
+      turns: 0,
     },
   });
   const [playGame, setPlayGame] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("api/userProfile")
+    fetch("/api/userProfile")
       .then((res) => res.json())
       .then((data) => {
         if (!data.error) setUserData(data);
       })
       .catch((err) => console.error(err))
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [playGame]);
+
+  // useEffect(() => {
+  //   fetch("/api/reset").catch((err) => console.error(err));
+  // }, []);
 
   if (isLoading) {
     return (
@@ -157,11 +169,15 @@ const MainApp = () => {
     );
   }
   return playGame ? (
-    <App userData={userData} />
+    <App
+      onEnd={() => {
+        setIsLoading(true);
+        setPlayGame(false);
+      }}
+    />
   ) : (
     <Splash userData={userData} onStart={() => setPlayGame(true)} />
   );
-  // return <Splash onStart={() => setPlayGame(true)} />;
 };
 
 createRoot(document.getElementById("root")!).render(

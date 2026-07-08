@@ -16,6 +16,7 @@ const useGradientGame = () => {
   const [turn, setTurn] = useState(0);
   const [isDone, setIsDone] = useState(false);
   const [startTime] = useState(Date.now());
+  const [totalTurns, setTotalTurns] = useState(0);
 
   useEffect(() => {
     const g = generateGrid();
@@ -66,13 +67,18 @@ const useGradientGame = () => {
         return next;
       });
     }
+
+    setTotalTurns((prev) => prev + 1);
+    console.log(totalTurns);
   };
   useEffect(() => {
     if (!gradient.length || gradient.length !== user.length) return;
 
     if (user.every((b, i) => b.col === gradient[i])) {
-      setIsDone(true);
-      handleGameCompletion(user, Date.now() - startTime);
+      console.log(turn);
+      handleGameCompletion(user, Date.now() - startTime, totalTurns).then(() =>
+        setIsDone(true)
+      );
 
       return;
     }
