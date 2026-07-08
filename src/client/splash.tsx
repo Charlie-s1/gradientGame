@@ -13,6 +13,7 @@ import {
   hasCompletedToday,
 } from "./utils/Scoring";
 import { ShareScreen } from "./app/ShareScreen";
+import { LoadingWheel } from "./utils/icons";
 
 export const Splash = ({
   userData,
@@ -164,7 +165,8 @@ const MainApp = () => {
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-800 dark:bg-gray-950 dark:text-slate-100">
-        Loading Profile...
+        <LoadingWheel/>
+      {/* //   Loading Profile... */}
       </div>
     );
   }
