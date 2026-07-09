@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { getPuzzleNumber } from "../utils/Scoring";
+import { calculateScore, formatTime, getPuzzleNumber } from "../utils/Scoring";
 
 interface ShareMenuProps {
   emojiGrid: string;
   streak: number;
-  timeTaken: number | null;
+  timeTaken: number;
+  turns: number;
   onClose: () => void;
 }
 
@@ -12,6 +13,7 @@ const ShareScreen = ({
   emojiGrid,
   streak,
   timeTaken,
+  turns,
   onClose,
 }: ShareMenuProps) => {
   const [status, setStatus] = useState<
@@ -19,15 +21,8 @@ const ShareScreen = ({
   >("idle");
   const puzzleNumber = getPuzzleNumber();
   // Format the time text cleanly
-  const formatTime = (ms: number | null) => {
-    if (!ms) return "0s";
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
-  };
 
-  const shareText = `Gradient Grid #${puzzleNumber}\n🔥 Streak: ${streak}\n⏱️ Time: ${formatTime(timeTaken)}\n\n${emojiGrid}\n`;
+  const shareText = `Gradient Grid #${puzzleNumber}\n🎯 Score: ${calculateScore(turns, timeTaken)}\n🔄️ Turns: ${turns}\n⏱️ Time: ${formatTime(timeTaken)}\n🔥 Streak: ${streak}\n\n${emojiGrid}\n`;
 
   const handleCopy = async () => {
     try {

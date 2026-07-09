@@ -43,7 +43,13 @@ const getTimeUntilNextPuzzle = () => {
 const calculateScore = (turns: number, time: number) => {
   return turns * 100000 + time;
 };
-
+const formatTime = (ms: number | null) => {
+  if (!ms) return "0s";
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+};
 // const updateStreak = () => {
 //   const today = new Date().toDateString();
 //   const last = localStorage.getItem("lastPlayed");
@@ -100,6 +106,7 @@ const handleGameCompletion = async (
         gameData: emojiGrid,
         timeSpent: timeTaken,
         turns: turn,
+        puzzleNum: getPuzzleNumber(),
       }),
     });
     const data = await res.json();
@@ -117,6 +124,7 @@ export {
   getPuzzleNumber,
   getTimeUntilNextPuzzle,
   calculateScore,
+  formatTime,
   // markCompletedToday,
   hasCompletedToday,
   // saveTodayResult,

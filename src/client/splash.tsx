@@ -8,6 +8,7 @@ import { UserData } from "../shared/types";
 import {
   buildEmojiGrid,
   calculateScore,
+  formatTime,
   getPuzzleNumber,
   getTimeUntilNextPuzzle,
   hasCompletedToday,
@@ -42,6 +43,7 @@ export const Splash = ({
               emojiGrid={userData.gameData.dailyResult?.emojiGrid ?? ""}
               streak={userData.gameData.streak}
               timeTaken={userData.gameData.timeSpent}
+              turns={userData.gameData.turns}
               onClose={() => setIsShareOpen(false)}
             />
           </div>
@@ -80,8 +82,9 @@ export const Splash = ({
               <div>
                 <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
                   #{getPuzzleNumber()} Result in{" "}
-                  {userData.gameData.timeSpent / 1000 || "N/A"}
-                  <span className="lowercase">s</span>
+                  <span className="lowercase">
+                    {formatTime(userData.gameData.timeSpent) || "N/A"}
+                  </span>
                 </p>
                 <p className="mb-3 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500 text-center">
                   score:{" "}
@@ -161,6 +164,15 @@ const MainApp = () => {
   // useEffect(() => {
   //   fetch("/api/reset").catch((err) => console.error(err));
   // }, []);
+
+  useEffect(() => {
+    fetch(`/api/leaderboard/${getPuzzleNumber()}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.error) console.log(data);
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
   if (isLoading) {
     return (

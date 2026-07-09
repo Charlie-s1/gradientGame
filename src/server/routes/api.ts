@@ -42,7 +42,7 @@ api.post("/saveGameData", async (c) => {
     return c.json({ error: "User not logged in" }, 401);
   }
   try {
-    const { gameData, timeSpent, turns } = await c.req.json();
+    const { gameData, timeSpent, turns, puzzleNum } = await c.req.json();
     const today = new Date().toDateString();
     const yesturday = new Date(Date.now() - 86400000).toDateString();
 
@@ -69,6 +69,10 @@ api.post("/saveGameData", async (c) => {
     stats.turns = turns;
 
     await redis.set(`userStats:${username}`, JSON.stringify(stats));
+
+    await redis.hSet(`puzzle:${puzzleNum}:leaderboard`, {
+      [username]: JSON.stringify({ turns: turns, timeSpent }),
+    });
     return c.json({ success: true, streak: stats.streak, gameData });
   } catch (error) {
     console.error(`Error saving game data: ${error}`);
@@ -76,6 +80,28 @@ api.post("/saveGameData", async (c) => {
   }
 });
 
+api.get("leaderboard/:puzzleNum", async (c) => {
+  const puzzleNum = c.req.param("puzzleNum");
+
+  const rawLeaderboard = await redis.hGetAll(`puzzle:${puzzleNum}:leaderboard`);
+
+  const leaderboard = Object.entries(rawLeaderboard).map(
+    ([username, stringifiedData]) => {
+      const data = JSON.parse(stringifiedData);
+      return {
+        username,
+        turns: data.turns,
+        timeMs: data.timeSpent,
+      };
+    }
+  );
+
+  return c.json(leaderboard);
+});
+
+/**
+ * DEBUG
+ */
 api.get("/reset", async (c) => {
   const username = context.username;
   if (!username) return c.json({ error: "Unauthorized" }, 401);
