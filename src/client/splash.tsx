@@ -15,6 +15,7 @@ import {
 } from "./utils/Scoring";
 import { ShareScreen } from "./app/ShareScreen";
 import { LoadingWheel } from "./utils/icons";
+import { ScoreCard } from "./app/ScoreCard";
 
 export const Splash = ({
   userData,
@@ -67,39 +68,7 @@ export const Splash = ({
           </div>
         </div>
 
-        <div className="flex flex-col justify-between h-full bg-white border-slate-200 dark:border-slate-800/80 dark:bg-slate-900/50 rounded-2xl border w-full max-2-sm backdrop-blur-sm p-5">
-          <div className="flex flex-col gap-3 items-center">
-            <div className="flex items-center px-4 text-sm py-1.5 border-orange-500/20 border rounded-full bg-amber-500/10">
-              <p className="text-orange-400 font-bold uppercase">
-                Current Streak{" "}
-                <span className="text-slate-950 dark:text-white">
-                  {userData.gameData.streak || 0}
-                </span>
-                🔥
-              </p>
-            </div>
-            {hasCompletedToday(userData.gameData.completedPuzzleDate) && (
-              <div>
-                <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
-                  #{getPuzzleNumber()} Result in{" "}
-                  <span className="lowercase">
-                    {formatTime(userData.gameData.timeSpent) || "N/A"}
-                  </span>
-                </p>
-                <p className="mb-3 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500 text-center">
-                  score:{" "}
-                  {calculateScore(
-                    userData.gameData.turns,
-                    userData.gameData.timeSpent
-                  )}
-                </p>
-                <div className="whitespace-pre-line leading-6 tracking-wide text-center">
-                  {userData.gameData.dailyResult?.emojiGrid}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <ScoreCard userData={userData} />
       </div>
       <div className="flex items-center gap-2 justify-center">
         {hasCompletedToday(userData.gameData.completedPuzzleDate) && (
@@ -177,8 +146,8 @@ const MainApp = () => {
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-800 dark:bg-gray-950 dark:text-slate-100">
-        <LoadingWheel/>
-      {/* //   Loading Profile... */}
+        <LoadingWheel />
+        {/* //   Loading Profile... */}
       </div>
     );
   }
