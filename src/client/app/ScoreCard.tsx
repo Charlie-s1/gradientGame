@@ -28,7 +28,8 @@ const ScoreCard = ({ userData }: { userData: UserData }) => {
         {hasCompletedToday(userData.gameData.completedPuzzleDate) && (
           <div>
             <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
-              #{getPuzzleNumber()} Result in{" "}
+              #{getPuzzleNumber()} Completed in {userData.gameData.turns} Turns
+              and{" "}
               <span className="lowercase">
                 {formatTime(userData.gameData.timeSpent) || "N/A"}
               </span>
