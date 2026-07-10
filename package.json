@@ -7,7 +7,7 @@
   "scripts": {
     "build": "vite build",
     "deploy": "npm run type-check && npm run lint && devvit upload",
-    "dev": "devvit playtest",
+    "dev": "devvit playtest r/gradientGame_dev",
     "launch": "npm run deploy && devvit publish",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "login": "devvit login",

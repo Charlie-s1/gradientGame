@@ -1,7 +1,7 @@
 import type { box } from "../hooks/useGradientGame";
 import { UserStats } from "../../shared/types";
 
-const START_DATE = new Date("2026-01-16T00:00:00Z");
+const START_DATE = new Date("2026-07-10T00:00:00Z");
 
 const scoreEmoji = (totalTurns: number) => {
   if (totalTurns <= 1) return "🟩";
@@ -50,44 +50,10 @@ const formatTime = (ms: number | null) => {
   const seconds = totalSeconds % 60;
   return minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
 };
-// const updateStreak = () => {
-//   const today = new Date().toDateString();
-//   const last = localStorage.getItem("lastPlayed");
-//   let streak = parseInt(localStorage.getItem("streak") || "0");
-
-//   if (last !== today) {
-//     streak =
-//       last === new Date(Date.now() - 86400000).toDateString() ? streak + 1 : 1;
-//   }
-//   localStorage.setItem("streak", streak.toString());
-//   localStorage.setItem("lastPlayed", today);
-//   return streak;
-// };
-
-// const markCompletedToday = () => {
-//   const today = new Date().toDateString();
-//   localStorage.setItem("completedPuzzle", today);
-// };
 
 const hasCompletedToday = (completedPuzzleDate: string | null) => {
   return completedPuzzleDate === new Date().toDateString();
 };
-
-// const saveTodayResult = (emojiGrid: string) => {
-//   const today = new Date().toDateString();
-//   localStorage.setItem(
-//     "dailyResult",
-//     JSON.stringify({ date: today, emojiGrid })
-//   );
-// };
-
-// const getTodayResult = (): string | null => {
-//   const raw = localStorage.getItem("dailyResult");
-//   if (!raw) return null;
-
-//   const parsed = JSON.parse(raw);
-//   return parsed.date === new Date().toDateString() ? parsed.emojiGrid : null;
-// };
 
 const handleGameCompletion = async (
   userGrid: box[],
@@ -120,14 +86,10 @@ const handleGameCompletion = async (
 export {
   scoreEmoji,
   buildEmojiGrid,
-  // updateStreak,
   getPuzzleNumber,
   getTimeUntilNextPuzzle,
   calculateScore,
   formatTime,
-  // markCompletedToday,
   hasCompletedToday,
-  // saveTodayResult,
-  // getTodayResult,
   handleGameCompletion,
 };
