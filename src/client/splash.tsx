@@ -6,14 +6,12 @@ import { createRoot } from "react-dom/client";
 import { App } from "./app/Game";
 import { UserData } from "../shared/types";
 import {
-  buildEmojiGrid,
   calculateScore,
   formatTime,
   getPuzzleNumber,
   getTimeUntilNextPuzzle,
   hasCompletedToday,
 } from "./utils/Scoring";
-import { ShareScreen } from "./app/ShareScreen";
 import { LoadingWheel } from "./utils/icons";
 import { ScoreCard } from "./app/ScoreCard";
 
@@ -25,7 +23,9 @@ export const Splash = ({
   onStart: () => void;
 }) => {
   const [timeLeft, setTimeLeft] = useState(getTimeUntilNextPuzzle());
-  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [shareStatus, setShareStatus] = useState<
+    "idle" | "loading" | "copied" | "posted"
+  >("idle");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -35,20 +35,33 @@ export const Splash = ({
     return () => clearInterval(interval);
   }, []);
 
+  const handleShare = async (userData: UserData) => {
+    const puzzleNumber = getPuzzleNumber();
+    const shareText = `Gradient Grid #${puzzleNumber}\n🎯 Score: ${calculateScore(userData.gameData.turns, userData.gameData.timeSpent)}\n🔄️ Turns: ${userData.gameData.turns}\n⏱️ Time: ${formatTime(userData.gameData.timeSpent)}\n🔥 Streak: ${userData.gameData.streak}\n\n${userData.gameData.dailyResult?.emojiGrid}\n`;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Gradient Grid #${puzzleNumber}`,
+          text: shareText,
+        });
+        return;
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(
+        shareText + "https://www.reddit.com/r/GradientGrid"
+      );
+      setShareStatus("copied");
+      setTimeout(() => setShareStatus("idle"), 2000);
+    } catch (err) {
+      console.error("Failed to copy", err);
+    }
+  };
+
   return (
     <div className="flex relative flex-col justify-center items-center min-h-screen gap-4 bg-slate-50 text-slate-800 dark:bg-gray-950 dark:text-slate-100">
-      {hasCompletedToday(userData.gameData.completedPuzzleDate) &&
-        isShareOpen && (
-          <div className="absolute top-4 right-4">
-            <ShareScreen
-              emojiGrid={userData.gameData.dailyResult?.emojiGrid ?? ""}
-              streak={userData.gameData.streak}
-              timeTaken={userData.gameData.timeSpent}
-              turns={userData.gameData.turns}
-              onClose={() => setIsShareOpen(false)}
-            />
-          </div>
-        )}
       <div className="flex flex-col justify-center items-center gap-4">
         <div className="flex flex-col gap-3">
           <div className="">
@@ -74,9 +87,29 @@ export const Splash = ({
         {hasCompletedToday(userData.gameData.completedPuzzleDate) && (
           <button
             className="flex items-center justify-center bg-slate-200 dark:bg-slate-300 text-slate-900 dark:text-slate-950 hover:bg-slate-300 dark:hover:bg-slate-900 dark:hover:text-slate-300 font-semibold duration-500 w-auto h-10 rounded-2xl cursor-pointer transition-colors px-4 "
-            onClick={() => setIsShareOpen(!isShareOpen)}
+            // onClick={() => setIsShareOpen(!isShareOpen)}
+            onClick={() => handleShare(userData)}
           >
-            Share
+            <span className="grid grid-cols-1 grid-rows-1">
+              <span
+                className={`col-start-1 row-start-1 transition-opacity duration-200 ${
+                  shareStatus == "copied"
+                    ? "opacity-0 pointer-events-none"
+                    : "opacity-100"
+                }`}
+              >
+                Share
+              </span>
+              <span
+                className={`col-start-1 row-start-1 transition-opacity duration-200 ${
+                  shareStatus == "copied"
+                    ? "opacity-100"
+                    : "opacity-0 pointer-events-none"
+                }`}
+              >
+                Copied
+              </span>
+            </span>
           </button>
         )}
         <button
@@ -129,10 +162,6 @@ const MainApp = () => {
       .catch((err) => console.error(err))
       .finally(() => setIsLoading(false));
   }, [playGame]);
-
-  // useEffect(() => {
-  //   fetch("/api/reset").catch((err) => console.error(err));
-  // }, []);
 
   useEffect(() => {
     fetch(`/api/leaderboard/${getPuzzleNumber()}`)

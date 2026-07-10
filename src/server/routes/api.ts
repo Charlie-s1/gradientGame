@@ -98,22 +98,3 @@ api.get("leaderboard/:puzzleNum", async (c) => {
 
   return c.json(leaderboard);
 });
-
-/**
- * DEBUG
- */
-api.get("/reset", async (c) => {
-  const username = context.username;
-  if (!username) return c.json({ error: "Unauthorized" }, 401);
-
-  try {
-    await redis.del(`userStats:${username}`);
-
-    return c.json({
-      success: true,
-      message: `Cleared Redis data for u/${username}`,
-    });
-  } catch (err) {
-    return c.json({ error: "Failed to reset test account" }, 500);
-  }
-});
