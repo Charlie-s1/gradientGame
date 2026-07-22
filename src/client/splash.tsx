@@ -4,7 +4,7 @@ import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 
 import { App } from "./app/Game";
-import { UserData } from "../shared/types";
+import { ScoreBoardScore, UserData } from "../shared/types";
 import {
   calculateScore,
   formatTime,
@@ -17,9 +17,11 @@ import { ScoreCard } from "./app/ScoreCard";
 
 export const Splash = ({
   userData,
+  scoreBoard,
   onStart,
 }: {
   userData: UserData;
+  scoreBoard: ScoreBoardScore[];
   onStart: () => void;
 }) => {
   const [timeLeft, setTimeLeft] = useState(getTimeUntilNextPuzzle());
@@ -81,7 +83,7 @@ export const Splash = ({
           </div>
         </div>
 
-        <ScoreCard userData={userData} />
+        <ScoreCard userData={userData} scoreBoard={scoreBoard} />
       </div>
       <div className="flex items-center gap-2 justify-center">
         {hasCompletedToday(userData.gameData.completedPuzzleDate) && (
@@ -150,6 +152,7 @@ const MainApp = () => {
       turns: 0,
     },
   });
+  const [scoreBoard, setScoreBoard] = useState([]);
   const [playGame, setPlayGame] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -167,10 +170,17 @@ const MainApp = () => {
     fetch(`/api/leaderboard/${getPuzzleNumber()}`)
       .then((res) => res.json())
       .then((data) => {
-        if (!data.error) console.log(data);
+        if (!data.error) {
+          const sorted = data.sort((a: ScoreBoardScore, b: ScoreBoardScore) => {
+            const scoreA = a.turns * 100000 + a.timeSpent;
+            const scoreB = b.turns * 100000 + b.timeSpent;
+            return scoreA - scoreB;
+          });
+          setScoreBoard(sorted);
+        }
       })
       .catch((err) => console.error(err));
-  }, []);
+  }, [playGame]);
 
   if (isLoading) {
     return (
@@ -188,7 +198,11 @@ const MainApp = () => {
       }}
     />
   ) : (
-    <Splash userData={userData} onStart={() => setPlayGame(true)} />
+    <Splash
+      userData={userData}
+      scoreBoard={scoreBoard}
+      onStart={() => setPlayGame(true)}
+    />
   );
 };
 

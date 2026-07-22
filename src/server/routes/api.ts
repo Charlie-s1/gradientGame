@@ -91,7 +91,7 @@ api.get("leaderboard/:puzzleNum", async (c) => {
       return {
         username,
         turns: data.turns,
-        timeMs: data.timeSpent,
+        timeSpent: data.timeSpent,
       };
     }
   );
