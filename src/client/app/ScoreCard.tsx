@@ -63,7 +63,7 @@ const ScoreCard = ({
         <ScoreBoardTable scoreBoard={scoreBoard} userData={userData} />
       )}
       <p className="text-center uppercase text-[10px] text-slate-500 tracking-wider pt-2 font-black">
-        {isFlipped ? "Tap to view score board" : "Tap to view my score"}
+        {!isFlipped ? "Tap to view leaderboard" : "Tap to view my score"}
       </p>
     </div>
   );

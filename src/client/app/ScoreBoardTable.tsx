@@ -22,7 +22,7 @@ const ScoreBoardTable = ({
           No scores yet today. Be the first!
         </div>
       ) : (
-        <div>
+        <div className="h-full">
           {(() => {
             const top5 = scoreBoard.slice(0, 5);
             const myIndex = scoreBoard.findIndex(
