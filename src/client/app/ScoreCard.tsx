@@ -19,7 +19,7 @@ const ScoreCard = ({
 
   return (
     <div
-      className="flex flex-col justify-between items-center w-[300px] h-[250px] perspective-1000 bg-white border-slate-200 dark:border-slate-800/80 dark:bg-slate-900/50 rounded-2xl border  max-2-sm backdrop-blur-sm p-5"
+      className="flex flex-col justify-between items-center w-[300px] h-[250px] cursor-pointer perspective-1000 bg-white border-slate-200 dark:border-slate-800/80 dark:bg-slate-900/50 rounded-2xl border  max-2-sm backdrop-blur-sm p-5"
       onClick={() => setIsFlipped(!isFlipped)}
     >
       {!isFlipped ? (
@@ -54,9 +54,6 @@ const ScoreCard = ({
                   <div className="whitespace-pre-line leading-6 tracking-wide text-center">
                     {userData.gameData.dailyResult?.emojiGrid}
                   </div>
-                  <p className="text-center uppercase text-[10px] text-slate-500 tracking-wider pt-2 font-black">
-                    Tap to view score board
-                  </p>
                 </div>
               </div>
             )}
@@ -65,6 +62,9 @@ const ScoreCard = ({
       ) : (
         <ScoreBoardTable scoreBoard={scoreBoard} userData={userData} />
       )}
+      <p className="text-center uppercase text-[10px] text-slate-500 tracking-wider pt-2 font-black">
+        {isFlipped ? "Tap to view score board" : "Tap to view my score"}
+      </p>
     </div>
   );
 };
